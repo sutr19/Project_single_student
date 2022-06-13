@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+  subnet:
+  - name: "creating project network"
+    state: present 
+    network_name: project_network
+    name: prokect_subnet
+    cidr: 10.0.1.0/27
+
+
+
+  #vars:
+  #    state: present
+  #    image: Ubuntu 20.04 Focal Fossa 20200423
+  #tasks:
+  #- name: "create HAproxy"
+    
