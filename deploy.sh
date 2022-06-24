@@ -1,20 +1,20 @@
 #!/bin/bash
 
 #variables
-key='p_key'
-net='p_network'
-subpool='p_pool'
+key='p-key'
+net='p-network'
+subpool='p-pool'
 sub='p-subnet'
-router='p_router'
-port='p_port'
-port1='p_port1'
-port2='p_port2'
-secgroup='p_security'
-proxy='p-tag_HAproxy'
-bastion='p-tag_bastion'
-node1='p-tag_node1'
-node2='p-tag_node2'
-node3='p-tag_node3'
+router='p-router'
+port='p-port'
+port1='p-port1'
+port2='p-port2'
+secgroup='p-security'
+proxy='p-tag-HAproxy'
+bastion='p-tag-bastion'
+node1='p-tag-node1'
+node2='p-tag-node2'
+node3='p-tag-node3'
 img='235d9bfb-7a13-4434-9966-cfc0ae033e79'
 fl='1C-1GB-20GB'
 
@@ -36,8 +36,8 @@ openstack router create --tag p-tag $router
 openstack port create --network $net --tag p-tag $port
 openstack port create --network $net --tag p-tag $port1
 openstack port create --network $net --tag p-tag $port2
+
 #router add properties
-openstack router add port $router $port
 openstack router add subnet $router $sub
 openstack router set --external-gateway ext-net $router
 
@@ -55,12 +55,12 @@ openstack server create --image $img --flavor $fl --key-name $key --network $net
 openstack server create --image $img --flavor $fl --key-name $key --network $net --security-group $secgroup $node3
 
 #floating ip
-openstack floating ip create ext-net -f json | -jq -r '.floating_ip_address' > floating_ip
-echo "Floating IP: $(cat floating_ip)"
+openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floating_ip
 fip1="$(cat floating_ip)"
 openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floating_ip
-echo "Floating IP: $(cat floating_ip)"
 fip2="$(cat floating_ip)"
+
+
 #adding floating ip
-openstack server add floating $proxy $fip1
-openstack server add floating $bastion $fip2
+openstack server add floating ip $proxy $fip1
+openstack server add floating ip $bastion $fip2
