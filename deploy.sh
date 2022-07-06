@@ -57,8 +57,8 @@ openstack server create --image $img --flavor $fl --key-name $key --network $net
 #floating ip
 openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floating_ip
 fip1="$(cat floating_ip)"
-openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floating_ip
-fip2="$(cat floating_ip)"
+openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floating_ip1
+fip2="$(cat floating_ip1)"
 
 
 #adding floating ip

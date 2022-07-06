@@ -1,9 +1,9 @@
 [HAproxy]  
-HAproxy 
+p-tag-HAproxy 
 [webservers]  
-devA  
-devB  
-devC  
+p-tag-node1  
+p-tag-node2  
+p-tag-node3  
  
 [all:vars]  
 ansible_user=ubuntu  
