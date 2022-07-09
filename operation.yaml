@@ -1,6 +1,6 @@
 ---
-#- hosts: webservers
- # gather_facts: yes
+- hosts: webservers
+  gather_facts: yes
 - hosts: HAproxy
   gather_facts: yes
   become: yes
@@ -19,3 +19,12 @@
       name: nginx 
       state: latest
       force_apt_get: yes
+  - name: "configuring TCP and UDP"
+    template:
+        src: "./nginx.j2"
+        dest: "/etc/nginx/nginx.conf"
+  - name: "restarting nginx"
+    service:
+       name: nginx
+       state: restarted
+  

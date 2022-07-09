@@ -1,0 +1,31 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+
+events {
+        worker_connections 768;
+        # multi_accept on;
+}
+stream {
+  upstream syslog_udp {
+    {% for servers in groups["webservers"] %}
+      server {{ hostvars[servers]['ansible_default_ipv4']['address'] }}:6000;
+    {% endfor %}
+  }
+  server {
+    listen 53 udp;
+    proxy_pass syslog_udp;
+  }
+  upstream stream_backend{
+    {% for servers in groups["webservers"] %}
+      server {{ hostvars[servers]['ansible_default_ipv4']['address'] }}:5000;
+    {% endfor %}
+  }
+  server {
+    listen 80;
+    proxy_pass stream_backend;
+  }
+}
+
+
