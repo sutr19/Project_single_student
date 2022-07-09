@@ -45,3 +45,10 @@
   - name: "installing gunicorn"
     apt:
       name: gunicorn
+  - name: "inastalling flask"
+    apt:
+      name: python3-flask
+  - name: "installing snmpd"
+    apt:
+      name: snmpd
+      state: latest
