@@ -38,5 +38,10 @@
       update_cache: true
       cache_valid_time: 7200
       force_apt_get: true
+  - name: "installing pip3"
+    apt:
+      name: python3-pip
   
-
+  - name: "installing gunicorn"
+    apt:
+      name: gunicorn
