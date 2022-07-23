@@ -62,4 +62,10 @@
       state: restarted
       enabled: yes
   - name: "copying service.py"
-    
+    copy:
+     src: service.py
+     dest: /home/ubuntu/service.py
+     owner: ubuntu
+     mode: 0644
+  - name: "running flask app"
+    shell: gunicorn -w 2 -D -b 0.0.0.0:5000 service:app

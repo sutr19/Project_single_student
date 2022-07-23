@@ -15,7 +15,7 @@ bastion='p-tag-bastion'
 node1='p-tag-node1'
 node2='p-tag-node2'
 node3='p-tag-node3'
-img='235d9bfb-7a13-4434-9966-cfc0ae033e79'
+#img='Ubuntu 20.04 Focal Fossa 20210616'
 fl='1C-1GB-20GB'
 
 #key 
@@ -45,14 +45,18 @@ openstack router set --external-gateway ext-net $router
 openstack security group create --tag p-tag $secgroup
 #rule
 openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 22 --protocol tcp --ingress $secgroup
+openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol tcp --ingress $secgroup
+openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 5000 --protocol tcp --ingress $secgroup
+openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 6000 --protocol udp --ingress $secgroup
+openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 53 --protocol udp --ingress $secgroup
 openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol icmp --ingress $secgroup
 
 #nodes
-openstack server create --image $img --flavor $fl --key-name $key --network $net --security-group $secgroup $proxy
-openstack server create --image $img --flavor $fl --key-name $key --network $net --security-group $secgroup $bastion
-openstack server create --image $img --flavor $fl --key-name $key --network $net --security-group $secgroup $node1
-openstack server create --image $img --flavor $fl --key-name $key --network $net --security-group $secgroup $node2
-openstack server create --image $img --flavor $fl --key-name $key --network $net --security-group $secgroup $node3
+openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor $fl --key-name $key --network $net --security-group $secgroup $proxy
+openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor $fl --key-name $key --network $net --security-group $secgroup $bastion
+openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor $fl --key-name $key --network $net --security-group $secgroup $node1
+openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor $fl --key-name $key --network $net --security-group $secgroup $node2
+openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor $fl --key-name $key --network $net --security-group $secgroup $node3
 
 #floating ip
 openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > floating_ip
