@@ -47,8 +47,8 @@ openstack security group create --tag p-tag $secgroup
 openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 22 --protocol tcp --ingress $secgroup
 openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol tcp --ingress $secgroup
 openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 5000 --protocol tcp --ingress $secgroup
-openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 6000 --protocol udp --ingress $secgroup
-openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 53 --protocol udp --ingress $secgroup
+openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 161 --protocol udp --ingress $secgroup
+openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 1611 --protocol udp --ingress $secgroup
 openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol icmp --ingress $secgroup
 
 #nodes
