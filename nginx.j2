@@ -10,11 +10,11 @@ events {
 stream {
   upstream syslog_udp {
     {% for servers in groups["webservers"] %}
-      server {{ hostvars[servers]['ansible_default_ipv4']['address'] }}:161;
+      server {{ hostvars[servers]['ansible_default_ipv4']['address'] }}:6000;
     {% endfor %}
   }
   server {
-    listen 1611 udp;
+    listen 53 udp;
     proxy_pass syslog_udp;
   }
   upstream stream_backend{
