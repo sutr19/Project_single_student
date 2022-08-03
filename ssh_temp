@@ -1,0 +1,3 @@
+      IdentityFile /home/hailay/network_operation/project/deploy_and_operate_service/pub-key
+      User ubuntu
+      ProxyCommand ssh bastion -W %h:%p   

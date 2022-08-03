@@ -3,8 +3,8 @@ p-tag-HAproxy
 [webservers]  
 p-tag-node1  
 p-tag-node2  
-p-tag-node3  
- 
+p-tag-node3             
+
 [all:vars]  
 ansible_user=ubuntu  
 ##REMOVED sshkey entry, handled by external SSH config file ##
