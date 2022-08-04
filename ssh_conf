@@ -1,5 +1,5 @@
-      HOST p-tag-node5
+      HOST p-tag-node6
       IdentityFile /home/hailay/network_operation/project/deploy_and_operate_service/pub-key
       User ubuntu
       ProxyCommand ssh bastion -W %h:%p   
-      Hostname 10.0.1.21               
+      Hostname 
