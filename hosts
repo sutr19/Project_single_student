@@ -1,11 +1,13 @@
-[HAproxy]  
-p-tag-HAproxy 
-[webservers] 
-p-tag-node1
-p-tag-node2
-p-tag-node3
-p-tag-node5
-p-tag-node4
-[all:vars]  
-ansible_user=ubuntu  
+[HAproxy]
+10.0.1.23
+[webservers]
+10.0.1.14
+10.0.1.22
+10.0.1.12
+
+[all:vars]
+ansible_port = 22
+ansible_user = ubuntu
+private_key_file = pub-key
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' ubuntu@89.46.80.77 -p 2222 \'ssh-add pub-key && nc %h %p\'"'
 ##REMOVED sshkey entry, handled by external SSH config file ##
