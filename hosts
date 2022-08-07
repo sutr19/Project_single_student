@@ -1,12 +1,13 @@
 [HAproxy]             
-10.0.1.23
-[webservers]                                                                                                             
-10.0.1.12              
-10.0.1.22              
-10.0.1.14              
+10.0.1.11
+[webservers]                                                                                                                                
+10.0.1.20              
+10.0.1.25              
+10.0.1.7               
 [all:vars]            
 ansible_port = 22
 ansible_user = ubuntu
 private_key_file = pub-key
-ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' ubuntu@ 89.46.80.77  -p 2222 \'ssh-add pub-key && nc %h %p\'"-p 2222'
 ##REMOVED sshkey entry, handled by external SSH config file ##
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' ubuntu@ 89.46.80.77 -p 2222 \'ssh-add pub-key && nc %h %p\'"-p 2222'
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -o \'ForwardAgent yes\' ubuntu@ 89.46.80.37 -p 2222 \'ssh-add pub-key && nc %h %p\'"-p 2222'

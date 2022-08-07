@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 count=0
 cmd='openstack server list | grep "p-tag-HAproxy" | cut -d"|" -f"5" | cut -d"=" -f"2" | cut -d"," -f"1">temp_ip'
