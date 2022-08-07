@@ -19,7 +19,7 @@ node3='p-tag-node3'
 fl='1C-1GB-20GB'
 
 #key 
-openstack keypair create $key
+openstack keypair create $key > pub-key
 
 #Network
 openstack network create --tag p-tag $net -f json

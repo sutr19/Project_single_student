@@ -34,8 +34,8 @@ while True:
                 ll.insert(7,"\n")
                 b.seek(0)
                 b.writelines(ll)
-            os.system(
-                'openstack server list |grep "p-tag-node3" | cut -d"|" -f"5" | cut -d"=" -f"2">temp_ip')
+            cmdip='openstack server list | grep {} | cut -d"|" -f"5" | cut -d"=" -f"2">temp_ip'.format(noden)
+            os.system(cmdip)
             with open("temp_ip") as f:
                 ip = str(f.read())
             host = "Hostname " + ip 
