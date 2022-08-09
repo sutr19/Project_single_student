@@ -1,18 +1,18 @@
 ---
-- hosts: localhost
-  tasks:
-  - name: "changing shell script file permission!"
-    command:
-        chmod +x deploy.sh
-  - name: "running shell script!"
-    command:
-        ./deploy.sh
-  - name: "changing python file permision"
-    command:
-       chmod +x ./hosts.py
-  - name: "running python script"
-    command:
-      ./hosts.py
+#- hosts: localhost
+#  tasks:
+#  - name: "changing shell script file permission!"
+#    command:
+#        chmod +x deploy.sh
+#  - name: "running shell script!"
+#    command:
+#       ./deploy.sh
+#  - name: "changing python file permision"
+#    command:
+#       chmod +x ./hosts.py
+#  - name: "running python script"
+#    command:
+#      ./hosts.py
 - hosts: webservers
   gather_facts: yes
 - hosts: HAproxy
