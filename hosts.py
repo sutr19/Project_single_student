@@ -23,14 +23,20 @@ with open("temp_ip", 'r') as f:
                 if lin in line:
                     count+=1
         if count==0:
-            ip1="p-tag-node"+str(k)+" ansible_host="+str(lin)
+            li=lin.rstrip()
+            cm='openstack server list | grep {} | cut -d"|" -f"3" >nodes'.format(li)
+            os.system(cm)
+            with open("nodes", 'r') as d:
+                ip=d.read()
+            ip=ip.rstrip()
+            ip1=ip+" ansible_host="+str(lin)
             with open("hosts", 'r+') as b:
                 l1=b.readlines()
                 ll.insert(k+2,ip1)
                 b.seek(0)
                 b.writelines(ll)
         k+=1
-cmd2='openstack server list | grep "p-tag-bastion" | cut -d"|" -f"5" | cut -d"=" -f"2" | cut -d"," -f"2">temp_ip'
+cmd2='openstack server list | grep "p-tag-bastion" | cut -d"|" -f"3 5" | cut -d"=" -f"2" | cut -d"," -f"2">temp_ip'
 os.system(cmd2)
 with open("temp_ip", 'r') as f:
     ip2=f.read()
@@ -45,7 +51,6 @@ with open("hosts", 'r+') as b:
 if c==0:
     with open("hosts", 'r+') as b:
         l1=b.readlines()
-        ll.insert(10,cmd3)
+        ll.insert(11,cmd3)
         b.seek(0)
         b.writelines(ll)
-time.sleep(60/6)
