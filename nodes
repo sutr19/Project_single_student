@@ -1,0 +1,5 @@
+| 2df7da71-051f-48b7-959c-438c3cf09ee4 | p-tag-node5   | ACTIVE | p-network=10.0.1.22              | Ubuntu 20.04 Focal Fossa 20210616 | 1C-1GB-20GB |
+| 044d1625-f26a-425a-a480-6b6414c905f0 | p-tag-node4   | ACTIVE | p-network=10.0.1.15              | Ubuntu 20.04 Focal Fossa 20210616 | 1C-1GB-20GB |
+| 02a165bc-2a9a-45bc-8665-ba1763776974 | p-tag-node3   | ACTIVE | p-network=10.0.1.11              | Ubuntu 20.04 Focal Fossa 20210616 | 1C-1GB-20GB |
+| e10c2375-c851-4c38-9dd0-b62f1abcaeab | p-tag-node2   | ACTIVE | p-network=10.0.1.25              | Ubuntu 20.04 Focal Fossa 20210616 | 1C-1GB-20GB |
+| 6b69af4e-0584-4a05-a889-53107630446e | p-tag-node1   | ACTIVE | p-network=10.0.1.19              | Ubuntu 20.04 Focal Fossa 20210616 | 1C-1GB-20GB |

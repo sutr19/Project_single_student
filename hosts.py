@@ -48,4 +48,4 @@ if c==0:
         ll.insert(10,cmd3)
         b.seek(0)
         b.writelines(ll)
-time.sleep(60/12)
+time.sleep(60/6)

@@ -2,21 +2,6 @@
 import os
 import time
 
-key = 'p-key'
-net = 'p-network'
-router = 'p-router'
-sub = 'p-subnet'
-subpool = 'p-pool'
-port = 'p-port'
-port1 = 'p-port1'
-port2 = 'p-port2'
-proxy = 'p-tag-HAproxy'
-bastion = 'p-tag-bastion'
-node1 = 'p-tag-node1'
-node2 = 'p-tag-node2'
-node3 = 'p-tag-node3'
-secgroup = 'p-security'
-
 # delete key
 os.system("openstack keypair delete p-key")
 
@@ -40,8 +25,7 @@ with open("nodes") as f:
     for line in f:
         cmd = 'openstack server delete {}'.format(line)
         os.system(cmd)
-        rmnd = "grep -v {} hosts > temphost && mv temphost hosts".format(line)
-        os.system(rmnd)
+os.system('grep -v "10.0.1" hosts > temphost && mv temphost hosts')   
 os.system('grep -v "ansible_ssh_common_args=" hosts > temphost && mv temphost hosts')
 
 # delete subnet poop and subnet
