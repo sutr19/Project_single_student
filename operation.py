@@ -12,6 +12,7 @@ while True:
     exist_node = 0
     with open("servers.conf") as f:
         required_node = int(f.read())
+        print(required_node)
     os.system('openstack server list | grep "p-tag-node" > nodes')
     with open("nodes") as f:
         lines = f.readlines()
@@ -33,10 +34,13 @@ while True:
                         os.system(cmdip)
                         with open("temp_ip") as f:
                            ip = f.read()
+                           print(ip)
+                        ip1="p-tag-node"+str(i)+" ansible_host="+str(ip)
+                        print(ip1)
                         with open("hosts", 'r+') as b:
                             ll = b.readlines()
-                            ll.insert(6, ip)
-                            ll.insert(7, "\n")
+                            ll.insert(6, ip1)
+                            #ll.insert(7, "\n")
                             b.seek(0)
                             b.writelines(ll)
                         break
