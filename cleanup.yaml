@@ -1,9 +1,9 @@
 ---
 - hosts: localhost
   tasks:
-  - name: "changing file permision"
+  - name: "changing  file permision"
     command:
-       chmod +x ./run.sh
+       chmod +x ./remov.py
   - name: "running  script"
     command:
-      ./run.sh
+      ./remov.py

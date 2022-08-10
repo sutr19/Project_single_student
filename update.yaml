@@ -1,47 +1,12 @@
 ---
 - hosts: localhost
   tasks:
-  - name: "changing shell script file permission!"
-    command:
-        chmod +x deploy.sh
-  - name: "running shell script!"
-    command:
-       ./deploy.sh
   - name: "changing python file permision"
     command:
-       chmod +x ./hosts.py
+       chmod +x ./opp.py
   - name: "running python script"
     command:
-      ./hosts.py
-- hosts: webservers
-  gather_facts: yes
-- hosts: HAproxy
-  gather_facts: yes
-  become: yes
-  become_method: sudo
-
-  tasks:
-  
-  - name: "System Update"
-    apt:
-      update_cache: true
-      upgrade: dist
-      cache_valid_time: 7200
-      force_apt_get: true
-
-  - name: "installing NGinx"
-    apt:
-      name: nginx 
-      state: latest
-      force_apt_get: yes
-  - name: "configuring TCP and UDP"
-    template:
-        src: "./nginx.j2"
-        dest: "/etc/nginx/nginx.conf"
-  - name: "restarting nginx"
-    service:
-       name: nginx
-       state: restarted
+      ./opp.py
 - hosts: webservers
   gather_facts: yes
   become: yes
@@ -84,3 +49,4 @@
      mode: 0644
   - name: "running flask app"
     shell: gunicorn -w 2 -D -b 0.0.0.0:5000 service:app
+  - at: command="ls -d / > /dev/null" count=20 units="seconds"

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import time
 count=0
 cmd='openstack server list | grep "p-tag-HAproxy" | cut -d"|" -f"5" | cut -d"=" -f"2" | cut -d"," -f"1">temp_ip'
 os.system(cmd)
@@ -47,3 +48,4 @@ if c==0:
         ll.insert(10,cmd3)
         b.seek(0)
         b.writelines(ll)
+time.sleep(60/12)

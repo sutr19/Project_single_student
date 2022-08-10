@@ -1,11 +1,10 @@
 [HAproxy]             
-p-tag-HAproxy ansible_host=10.0.1.19
+p-tag-HAproxy ansible_host=10.0.1.29
 [webservers]                                                                                                                                            
-p-tag-node1 ansible_host=10.0.1.20              
-p-tag-node2 ansible_host=10.0.1.28              
-p-tag-node3 ansible_host=10.0.1.13                                              
+p-tag-node1 ansible_host=10.0.1.9                  
+p-tag-node2 ansible_host=10.0.1.14                 
+p-tag-node3 ansible_host=10.0.1.23                 
 [all:vars]            
 ansible_user=ubuntu
 ansible_ssh_private_key_file = pub-key
 ##REMOVED sshkey entry, handled by external SSH config file ##
-ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand=" ssh -W %h:%p -q ubuntu@89.46.80.69 -i pub-key"'
