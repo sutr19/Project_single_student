@@ -5,9 +5,13 @@ import time
 # delete key
 os.system("openstack keypair delete p-key")
 
-# delete floating IP
-os.system("openstack floating ip delete $(cat floating_ip)")
-os.system("openstack floating ip delete $(cat floating_ip1)")
+# delete floating IP\
+os.system('openstack floating ip list | grep "." | cut -d"|" -f"3">floating_ip')
+with open("floating_ip")as f:
+    for fp in f:
+        pp=fp.rstrip()
+        cmd='openstack floating ip delete {}'.format(pp)
+        os.system(cmd)
 
 # delete router
 os.system("openstack router unset --external-gateway --tag p-tag p-router")
@@ -15,9 +19,11 @@ os.system("openstack router remove subnet p-router p-subnet")
 os.system("openstack router delete p-router")
 
 # port delete
-os.system("openstack port delete p-port")
-os.system("openstack port delete p-port1")
-os.system("openstack port delete p-port2")
+os.system('openstack port list | grep "port" | cut -d"|" -f"3" >nodes')
+with open("nodes") as f:
+    for line in f:
+        cmd = 'openstack port delete {}'.format(line)
+        os.system(cmd)
 
 # deleting nodes
 os.system('openstack server list | grep "p-tag" | cut -d"|" -f"3" >nodes')
