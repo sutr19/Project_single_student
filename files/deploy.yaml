@@ -1,20 +1,20 @@
 ---
-- hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-  - name: "changing shell script file permission!"
-    command:
-       chmod +x deploy.py
-  - name: "running shell script!"
-    command:
-       ./deploy.py
-  - name: "changing python file permision"
-    command:
-       chmod +x ./hosts.py
-  - name: "running python script"
-    command:
-      ./hosts.py
+#- hosts: localhost
+#  connection: local
+#  gather_facts: false
+#  tasks:
+#  - name: "changing shell script file permission!"
+#    command:
+#       chmod +x deploy.py
+#  - name: "running shell script!"
+#    command:
+#       ./deploy.py
+#  - name: "changing python file permision"
+#    command:
+#       chmod +x ./hosts.py
+#  - name: "running python script"
+#    command:
+#      ./hosts.py
 - hosts: webservers
   gather_facts: yes
 - hosts: HAproxy
@@ -86,3 +86,4 @@
      mode: 0644
   - name: "running flask app"
     shell: gunicorn -w 2 -D -b 0.0.0.0:5000 service:app
+  

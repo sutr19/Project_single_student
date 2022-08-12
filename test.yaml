@@ -1,8 +1,0 @@
-- hosts: webservers
-  gather_facts: yes
-  tasks:
-  - action: ping
-- hosts: HAproxy
-  gather_facts: yes
-  tasks:
-  - action: ping

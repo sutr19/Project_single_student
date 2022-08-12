@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from sys import argv
 import time
 
 # delete key
@@ -7,6 +8,8 @@ os.system("openstack keypair delete p-key")
 
 # delete floating IP\
 os.system('openstack floating ip list | grep "." | cut -d"|" -f"3">floating_ip')
+os.system('grep -v "Floating" floating_ip > temphost && mv temphost floating_ip') 
+os.system('grep -v "+--" floating_ip > temphost && mv temphost floating_ip')
 with open("floating_ip")as f:
     for fp in f:
         pp=fp.rstrip()
