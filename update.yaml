@@ -1,12 +1,4 @@
 ---
-- hosts: localhost
-  tasks:
-  - name: "changing python file permision"
-    command:
-       chmod +x ./opp.py
-  - name: "running python script"
-    command:
-      ./opp.py
 - hosts: webservers
   gather_facts: yes
 - hosts: HAproxy

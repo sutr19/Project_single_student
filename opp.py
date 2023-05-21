@@ -7,7 +7,7 @@ fl = '1C-1GB-20GB'
 key = 'p-key'
 net = 'p-network'
 secgroup = 'p-security'
-img = 'Ubuntu 20.04 Focal Fossa 20210616'
+img = 'Ubuntu 22.04.1 Jammy Jellyfish 230124'
 loop = 0
 exist_node = 0
 with open("servers.conf") as f:
@@ -26,7 +26,7 @@ if required_node > exist_node:
             with open('nodes') as n:
                 noden = node_name+str(i)
                 if noden not in n.read():
-                    cmd = "openstack server create --image 'Ubuntu 20.04 Focal Fossa 20210616' --flavor {} --key-name {} --network {}  --security-group {} {}".format(
+                    cmd = "openstack server create --image 'Ubuntu 22.04.1 Jammy Jellyfish 230124' --flavor {} --key-name {} --network {}  --security-group {} {}".format(
                         fl, key, net, secgroup, noden)
                     os.system(cmd)
                     time.sleep(60/12)
