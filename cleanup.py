@@ -46,4 +46,4 @@ os.system("openstack subnet pool delete p-pool")
 os.system("openstack network delete p-network")
 
 # delete security group
-os.system("openstack security group delete p-security")
+#os.system("openstack security group delete p-security")

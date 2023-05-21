@@ -17,8 +17,9 @@ fl='1C-1GB-20GB'
 os.system('openstack keypair list>nodes')
 with open("nodes") as f:
     if key not in f.read():
-        cmd='openstack keypair create {}> pub-key'.format(key)
+        cmd='openstack keypair create {}> private-key'.format(key)
         os.system(cmd)
+        os.system('chmod 600 private-key')
 
 #Network
 os.system('openstack network list>nodes')
@@ -47,17 +48,6 @@ with open("nodes") as f:
         cmd='openstack router create --tag p-tag {} '.format(router)
         os.system(cmd)
 
-#port
-
-    i=1
-    while i<=3:
-        os.system('openstack port list>nodes')
-        with open("nodes") as f:
-            por=port+str(i)
-            if por not in f.read():
-                cmd='openstack port create --network {} --tag p-tag {} '.format(net,por)
-                os.system(cmd)
-        i+=1
 
 #router add properties
 cmd='openstack router add subnet {} {}'.format(router,sub)
@@ -66,28 +56,28 @@ cmd1='openstack router set --external-gateway ext-net {}'.format(router)
 os.system(cmd1)
 
 #security group
-os.system('openstack security group list>nodes')
-with open("nodes") as f:
-    if secgroup not in f.read():
-        cmd='openstack security group create --tag p-tag {}'.format(secgroup)
-        os.system(cmd)
+#os.system('openstack security group list>nodes')
+#with open("nodes") as f:
+ #   if secgroup not in f.read():
+  #      cmd='openstack security group create --tag p-tag {}'.format(secgroup)
+  #      os.system(cmd)
 #rule
-os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 22 --protocol tcp --ingress p-security')
-os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol tcp --ingress p-security')
-os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 5000 --protocol tcp --ingress p-security')
-os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 6000 --protocol udp --ingress p-security')
-os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 53 --protocol udp --ingress p-security')
-os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol icmp --ingress p-security')
+#os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 22 --protocol tcp --ingress p-security')
+#os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol tcp --ingress p-security')
+#os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 5000 --protocol tcp --ingress p-security')
+#os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 6000 --protocol udp --ingress p-security')
+#os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 53 --protocol udp --ingress p-security')
+#os.system('openstack security group rule create --remote-ip 0.0.0.0/0 --dst-port 80 --protocol icmp --ingress p-security')
 
 #nodes
 os.system('openstack server list>nodes')
 with open("nodes") as f:
     if proxy not in f.read():
-        cmd='openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor {} --key-name {} --network {} --security-group {} {}'.format(fl,key,net,secgroup,proxy)
+        cmd='openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(fl,key,net,proxy)
         os.system(cmd)
 with open("nodes") as f:
     if bastion not in f.read():
-        cmd1='openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor {} --key-name {} --network {} --security-group {} {}'.format(fl,key,net,secgroup,bastion)
+        cmd1='openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(fl,key,net,bastion)
         os.system(cmd1)
 
 k=1
@@ -96,7 +86,7 @@ while k<=3:
     with open("nodes") as f:
         nod=node+str(k)
         if nod not in f.read():
-            cmd2='openstack server create --image "Ubuntu 20.04 Focal Fossa 20210616" --flavor {} --key-name {} --network {} --security-group {} {}'.format(fl,key,net,secgroup,nod)
+            cmd2='openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(fl,key,net,nod)
             os.system(cmd2)
     k+=1
 #floating ip

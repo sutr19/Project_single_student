@@ -1,20 +1,22 @@
 ---
-#- hosts: localhost
-#  connection: local
-#  gather_facts: false
-#  tasks:
-#  - name: "changing shell script file permission!"
-#    command:
-#       chmod +x deploy.py
-#  - name: "running shell script!"
-#    command:
-#       ./deploy.py
-#  - name: "changing python file permision"
-#    command:
-#       chmod +x ./hosts.py
-#  - name: "running python script"
-#    command:
-#      ./hosts.py
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: "checking.........!"
+    file:
+      path: deploy.py
+      mode: 'u+x'
+  - name: "Deploying the network. please wait patiently!"
+    command:
+       ./deploy.py
+  - name: "Preparing to create inventory file"
+    file:
+      path: hosts.py
+      mode: 'u+x'
+  - name: "Creating inventory file. Please wait patiently"
+    command:
+      ./hosts.py
 - hosts: webservers
   gather_facts: yes
 - hosts: HAproxy
