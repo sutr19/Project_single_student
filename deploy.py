@@ -14,6 +14,7 @@ proxy='p-tag-HAproxy'
 bastion='p-tag-bastion'
 node='p-tag-node'
 fl='1C-1GB-20GB'
+host_key='ansible_ssh_common_args="-o StrictHostKeyChecking=accept-new"'
 
 GROUP_HAPROXY = "[HAproxy]"
 GROUP_WEBSERVERS = "[webservers]"
@@ -141,9 +142,9 @@ with open("hosts", 'a+') as f:
     # Add bastion server to hosts file
     bastion_ip = subprocess.check_output("openstack server list | grep 'p-tag-bastion' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2", shell=True).decode('utf-8').strip()
     ssh_cmd = f"ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ProxyCommand=\"ssh -i private-key -W %h:%p -q ubuntu@{bastion_ip} \"'"
-    #bss = f"p-tag-bastion ansible_host={bastion_ip}"
-    #f.write(f"{BASTION_HOST}\n{bss}\n")
-    #f.write("\n")
+    bss = f"p-tag-bastion ansible_host={bastion_ip}"
+    f.write(f"{BASTION_HOST}\n{bss}\n")
+    f.write("\n")
     # Add authorized_keys to webservers group vars
     #f.write(f"{Web_Varr}\n{'ansible_user=ubuntu'}\n{ssh_cmd}\n")
     #f.write("\n")

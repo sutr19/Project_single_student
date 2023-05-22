@@ -12,6 +12,7 @@ loop = 0
 exist_node = 0
 with open("servers.conf") as f:
     required_node = int(f.read())
+    print(required_node)
 os.system('openstack server list | grep "p-tag-node" > nodes')
 with open("nodes") as f:
     lines = f.readlines()
@@ -25,9 +26,10 @@ if required_node > exist_node:
         while True:
             with open('nodes') as n:
                 noden = node_name+str(i)
+                print(noden,"\n")
                 if noden not in n.read():
-                    cmd = "openstack server create --image 'Ubuntu 22.04.1 Jammy Jellyfish 230124' --flavor {} --key-name {} --network {}  --security-group {} {}".format(
-                        fl, key, net, secgroup, noden)
+                    cmd = "openstack server create --image 'Ubuntu 22.04.1 Jammy Jellyfish 230124' --flavor {} --key-name {} --network {}  {}".format(
+                        fl, key, net,  noden)
                     os.system(cmd)
                     time.sleep(60/12)
                     cmdip = 'openstack server list | grep {} | cut -d"|" -f"5" | cut -d"=" -f"2">temp_ip'.format(
@@ -36,10 +38,10 @@ if required_node > exist_node:
                     with open("temp_ip") as f:
                         ip = f.read()
                         ip1 = "p-tag-node"+str(i)+" ansible_host="+str(ip)
+                        print(ip1, "\n")
                     with open("hosts", 'r+') as b:
                         ll = b.readlines()
                         ll.insert(4, ip1)
-                        #ll.insert(7, "\n")
                         b.seek(0)
                         b.writelines(ll)
                     break

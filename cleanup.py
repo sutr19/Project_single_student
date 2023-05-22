@@ -40,7 +40,7 @@ with open("nodes") as f:
 
 # delete subnet pool and subnet
 os.system("openstack subnet  delete p-subnet")
-#os.system("openstack subnet pool delete p-pool")
+os.system("openstack subnet pool delete p-pool")
 
 
 # delete network

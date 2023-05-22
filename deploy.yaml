@@ -1,11 +1,42 @@
 ---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: "checking.........!"
+    file:
+      path: deploy.py
+      mode: 'u+x'
+  - name: "Deploying the network. please wait patiently!"
+    command:
+      ./deploy.py
+  #- name: Set ANSIBLE_HOST_KEY_CHECKING to False
+  #  set_fact:
+  #    ansible_env:
+  #      ANSIBLE_HOST_KEY_CHECKING: False
+  #- name: Extract Bastion public IP
+  #  set_fact:
+  #    bastion_public_ip: "{{ hostvars[item].ansible_host }}"
+  #  when: item in groups['Bastion']
+  #  loop: "{{ groups['Bastion'] }}"
+
+  #- name: Extract webserver private IPs
+  #  set_fact:
+  #    webserver_private_ips: "{{ groups['webservers'] | map('extract', hostvars, 'ansible_host') | list }}"
+
+  #- name: Display extracted IPs
+  #  debug:
+  #    msg: "Bastion IP: {{ bastion_public_ip }}, Webserver IPs: {{ webserver_private_ips }}"
+  #- name: SSH into the node
+  #  command: >
+  #    ssh -i private-key -o ProxyCommand="ssh -i private-key -W %h:%p ubuntu@{{ bastion_public_ip }}" ubuntu@{{ item }}
+  #  loop: "{{ webserver_private_ips }}"
 - hosts: webservers
   gather_facts: yes
 - hosts: HAproxy
   gather_facts: yes
   become: yes
   become_method: sudo
-
   tasks:
   
   - name: "System Update"

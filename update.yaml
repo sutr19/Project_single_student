@@ -1,4 +1,15 @@
 ---
+- hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: "checking.........!"
+    file:
+      path: opp.py
+      mode: 'u+x'
+  - name: "Working on updates!"
+    command:
+       ./opp.py
 - hosts: webservers
   gather_facts: yes
 - hosts: HAproxy
