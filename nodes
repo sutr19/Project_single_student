@@ -1,10 +1,8 @@
- p-tag-node8   
- p-tag-node7   
- p-tag-node6   
- p-tag-node5   
- p-tag-node4   
- p-tag-node3   
- p-tag-node2   
- p-tag-node1   
- p-tag-bastion 
- p-tag-HAproxy 
++--------------------------------------+---------------+--------+---------------------+---------------------------------------+-------------+
+| ID                                   | Name          | Status | Networks            | Image                                 | Flavor      |
++--------------------------------------+---------------+--------+---------------------+---------------------------------------+-------------+
+| be57cee2-5ec3-4e1a-a759-5de7d78ebbee | p-tag-node2   | BUILD  |                     | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+| bd8c2796-f6c6-4138-8c11-0c57b690c760 | p-tag-node1   | ACTIVE | p-network=10.0.1.27 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+| 20958d48-226c-4b25-926a-468345fe9cf3 | p-tag-bastion | ACTIVE | p-network=10.0.1.23 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+| a7cabdf0-3afa-4d18-bc85-af3f4de507df | p-tag-HAproxy | ACTIVE | p-network=10.0.1.17 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
++--------------------------------------+---------------+--------+---------------------+---------------------------------------+-------------+
