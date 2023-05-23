@@ -51,3 +51,28 @@ Host *
     SendEnv LANG LC_*
     HashKnownHosts yes
     GSSAPIAuthentication yes
+Host 10.0.1.29
+  HostName 10.0.1.29
+  User ubuntu
+IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key
+StrictHostKeyChecking no
+Host bastion
+  HostName p-tag-bastion
+  User ubuntu
+IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key
+StrictHostKeyChecking no
+Host 10.0.1.18
+  HostName 10.0.1.18
+  User ubuntu
+IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key
+StrictHostKeyChecking no
+Host 10.0.1.12                  
+  HostName 10.0.1.12                  
+  User ubuntu
+IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key
+StrictHostKeyChecking no
+Host 10.0.1.5                   
+  HostName 10.0.1.5                   
+  User ubuntu
+IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key
+StrictHostKeyChecking no

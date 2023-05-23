@@ -7,6 +7,9 @@
     file:
       path: deploy.py
       mode: 'u+x'
+  - name: "Deploying the network. please wait patiently!"
+    command:
+       ./deploy.py
 - hosts: webservers
   vars:
     ansible_ssh_common_args: '-F ./ssh_config'
