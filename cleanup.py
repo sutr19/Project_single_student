@@ -48,3 +48,14 @@ os.system("openstack network delete p-network")
 
 # delete security group
 #os.system("openstack security group delete p-security")
+
+def remove_lines(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+
+    with open(filename, 'w') as file:
+        file.writelines(lines[:53])  # Keep lines from 1 to 53 (inclusive)
+
+# Usage example
+filename = 'ssh_config'  # Replace with your file name
+remove_lines(filename)
