@@ -122,6 +122,8 @@ os.system(cc)
 print("Creating inventory file. Please wait patiently!\n")
 if os.path.exists("hosts"):
     os.remove("hosts")
+else:
+    pass
 with open("hosts", 'a+') as f:
     # Add bastion server to hosts file
     bastion_ip = subprocess.check_output("openstack server list | grep 'p-tag-bastion' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2", shell=True).decode('utf-8').strip()
