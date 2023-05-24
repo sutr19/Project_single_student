@@ -1,13 +1,15 @@
 [Bastion]
-p-tag-bastion ansible_host=91.106.199.2
+p-tag-bastion ansible_host=91.106.199.152
 
 [HAproxy]
-p-tag-HAproxy ansible_host=10.0.1.4
+p-tag-node4 ansible_host=10.0.1.4                  
+
+p-tag-HAproxy ansible_host=10.0.1.7
 
 [webservers]
-p-tag-node1 ansible_host=10.0.1.27
-p-tag-node2 ansible_host=10.0.1.29                 
-p-tag-node3 ansible_host=10.0.1.17                 
+p-tag-node1 ansible_host=10.0.1.10
+p-tag-node2 ansible_host=10.0.1.20                 
+p-tag-node3 ansible_host=10.0.1.13                 
 
 [all:vars]
 ansible_user=ubuntu

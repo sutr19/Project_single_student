@@ -1,18 +1,4 @@
 ---
-- hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-  - name: "checking.........!"
-    file:
-      path: deploy.py
-      mode: 'u+x'
-  - name: "Deploying the network. please wait patiently!"
-    command:
-       ./deploy.py
-  - name: Wait for a specific duration
-      pause:
-        seconds: 30
 - hosts: webservers
   vars:
     ansible_ssh_common_args: '-F ./ssh_config'
