@@ -32,13 +32,15 @@ if required_node > exist_node:
                     cmd = "openstack server create --image 'Ubuntu 22.04.1 Jammy Jellyfish 230124' --flavor {} --key-name {} --network {}  {}".format(
                         fl, key, net,  noden)
                     os.system(cmd)
-                    time.sleep(60/10)
+                    time.sleep(60/6)
                     cmdip = 'openstack server list | grep {} | cut -d"|" -f"5" | cut -d"=" -f"2">temp_ip'.format(
                         noden)
                     os.system(cmdip)
                     with open("temp_ip") as f:
                         ip = f.read()
                         ip1 = "p-tag-node"+str(i)+" ansible_host="+str(ip)+"\n"
+                    with open("ssh_config", 'a+') as s:
+                        s.write(f"{'Host '}{ip}\n{'  HostName '}{ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./private-key'}\n{'  StrictHostKeyChecking no'}\n")
                     with open("hosts", 'r+') as b:
                         ll = b.readlines()
                         ll.insert(k, ip1)

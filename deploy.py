@@ -130,14 +130,14 @@ with open("hosts", 'a+') as f:
     f.write(f"{BASTION_HOST}\n{bss}\n")
     f.write("\n")
     with open("ssh_config", 'a+') as s:
-        s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}{'  IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+        s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile ./private-key'}\n{'  StrictHostKeyChecking no'}\n")
     # Add HAproxy server to hosts file
     haproxy_ip = subprocess.check_output("openstack server list | grep 'p-tag-HAproxy' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
     haproxy = f"p-tag-HAproxy ansible_host={haproxy_ip}"
     f.write(f"{GROUP_HAPROXY}\n{haproxy}\n")
     f.write("\n")
     with open("ssh_config", 'a+') as s:
-        s.write(f"{'Host '}{haproxy_ip}\n{'  HostName '}{haproxy_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}{'  IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+        s.write(f"{'Host '}{haproxy_ip}\n{'  HostName '}{haproxy_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./private-key'}\n{'  StrictHostKeyChecking no'}\n")
     # Add web servers to hosts file
     web_servers = subprocess.check_output(
         "openstack server list | grep 'p-tag-node' | cut -d'|' -f5 | cut -d'=' -f2", shell=True).decode('utf-8').strip().split('\n')
@@ -154,7 +154,7 @@ with open("hosts", 'a+') as f:
                     node = f"{node_ip} ansible_host={server}"
                     if node not in f.read():
                          f.write(f"{node}\n")
-                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}{'  IdentityFile /home/hailay/hai-project/deploy_and_operate_service/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./private-key'}\n{'  StrictHostKeyChecking no'}\n")
 
                     else:
                         pass
