@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Working on updates..."
-chmod +x opp.py
-./opp.py
+chmod +x ./all/opp.py
+./all/opp.py
 sleep 5
-ansible-playbook update.yaml
+ansible-playbook ./all/update.yaml

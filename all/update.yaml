@@ -7,12 +7,11 @@
     file:
       path: opp.py
       mode: 'u+x'
-  - name: "Working on updates!"
-    command:
-       ./opp.py
-  - name: Wait for a specific duration
-    pause:
-      seconds: 30
+  #- name: "Working on updates!"
+ #   command:
+ #      ./opp.py
+ # - name: Wait for a specific duration
+ #    seconds: 30
 - hosts: webservers
   vars:
     ansible_ssh_common_args: '-F ./ssh_config'
