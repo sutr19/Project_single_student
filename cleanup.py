@@ -8,10 +8,10 @@ import time
 os.system("openstack keypair delete p-key")
 
 # delete floating IP\
-os.system('openstack floating ip list | grep "." | cut -d"|" -f"3">floating_ip')
-os.system('grep -v "Floating" floating_ip > temphost && mv temphost floating_ip') 
-os.system('grep -v "+--" floating_ip > temphost && mv temphost floating_ip')
-with open("floating_ip")as f:
+os.system('openstack floating ip list | grep "." | cut -d"|" -f"3">./all/floating_ip')
+os.system('grep -v "Floating" ./all/floating_ip > temphost && mv temphost ./all/floating_ip') 
+os.system('grep -v "+--" ./all/floating_ip > temphost && mv temphost ./all/floating_ip')
+with open("./all/floating_ip")as f:
     for fp in f:
         pp=fp.rstrip()
         cmd='openstack floating ip delete {}'.format(pp)
@@ -30,8 +30,8 @@ os.system("openstack router delete p-router")
 #        os.system(cmd)
 
 # deleting nodes
-os.system('openstack server list | grep "p-tag" | cut -d"|" -f"3" >nodes')
-with open("nodes") as f:
+os.system('openstack server list | grep "p-tag" | cut -d"|" -f"3" >./all/nodes')
+with open("./all/nodes") as f:
     for line in f:
         cmd = 'openstack server delete {}'.format(line)
         os.system(cmd)
@@ -57,5 +57,5 @@ def remove_lines(filename):
         file.writelines(lines[:53])  # Keep lines from 1 to 53 (inclusive)
 
 # Usage example
-filename = 'ssh_config'  # Replace with your file name
+filename = './all/ssh_config'  # Replace with your file name
 remove_lines(filename)

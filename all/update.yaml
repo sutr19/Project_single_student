@@ -1,24 +1,11 @@
 ---
-- hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-  - name: "checking.........!"
-    file:
-      path: opp.py
-      mode: 'u+x'
-  #- name: "Working on updates!"
- #   command:
- #      ./opp.py
- # - name: Wait for a specific duration
- #    seconds: 30
 - hosts: webservers
   vars:
-    ansible_ssh_common_args: '-F ./ssh_config'
+    ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
 - hosts: HAproxy
   vars:
-    ansible_ssh_common_args: '-F ./ssh_config'
+    ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
   become: yes
   become_method: sudo
@@ -26,7 +13,7 @@
   tasks:
   - name: "configuring TCP and UDP"
     template:
-        src: "./nginx.j2"
+        src: "nginx.j2"
         dest: "/etc/nginx/nginx.conf"
   - name: "restarting nginx"
     service:
@@ -59,7 +46,7 @@
       state: latest
   - name: "configuring snmpd"
     template:
-      src: "./snmpd.conf"
+      src: "snmpd.conf"
       dest: "/etc/snmp/snmpd.conf"
   - name: "restarting snmpd"
     service:
