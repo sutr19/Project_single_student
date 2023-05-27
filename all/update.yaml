@@ -3,7 +3,7 @@
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
-- hosts: HAproxy
+- hosts: Proxy
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes

@@ -3,7 +3,7 @@
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
-- hosts: HAproxy
+- hosts: Proxy
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
@@ -17,7 +17,6 @@
       upgrade: dist
       cache_valid_time: 7200
       force_apt_get: true
-
   - name: "installing NGinx"
     apt:
       name: nginx 
@@ -31,6 +30,55 @@
     service:
        name: nginx
        state: restarted
+  - name: "Install keepalived package"
+    package:
+      name: keepalived
+      state: present 
+- hosts: p-tag-proxy1
+  vars:
+    ansible_ssh_common_args: '-F ./all/ssh_config'
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  tasks:
+    
+  - name: Configure keepalived
+    template:
+      src: keepalive1.j2
+      dest: /etc/keepalived/keepalived.conf
+    notify: restart keepalived
+  handlers:
+  - name: restart keepalived
+    service:
+      name: keepalived
+      state: restarted
+
+  - name: reload nginx
+    service:
+      name: nginx
+      state: reloaded
+- hosts: p-tag-proxy2
+  vars:
+    ansible_ssh_common_args: '-F ./all/ssh_config'
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  tasks: 
+  - name: Configure keepalived
+    template:
+      src: keepalive2.j2
+      dest: /etc/keepalived/keepalived.conf
+    notify: restart keepalived  
+  handlers:
+  - name: restart keepalived
+    service:
+      name: keepalived
+      state: restarted
+
+  - name: reload nginx
+    service:
+      name: nginx
+      state: reloaded
 - hosts: webservers
   gather_facts: yes
   become: yes

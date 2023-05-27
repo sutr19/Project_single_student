@@ -10,19 +10,21 @@ sub = 'p-subnet'
 router = 'p-router'
 port = 'p-port'
 secgroup = 'p-security'
-proxy = 'p-tag-HAproxy'
+proxy1 = 'p-tag-proxy1'
+proxy2 = 'p-tag-proxy2'
 bastion = 'p-tag-bastion'
 node = 'p-tag-node'
 fl = '1C-1GB-20GB'
-host_key = 'ansible_ssh_common_args="-o StrictHostKeyChecking=accept-new"'
 
-GROUP_HAPROXY = "[HAproxy]"
+
+GROUP_HAPROXY = "[Proxy]"
 GROUP_WEBSERVERS = "[webservers]"
 GROUP_ALL_VARS = "[all:vars]"
 BASTION_HOST = "[Bastion]"
 Web_Varr = "[webservers:vars]"
 node_ips = []
 
+print("Deploying Network..........\n\n")
 # key
 os.system('openstack keypair list>./all/nodes')
 with open("./all/nodes") as f:
@@ -67,11 +69,16 @@ os.system(cmd)
 cmd1 = 'openstack router set --external-gateway ext-net {}'.format(router)
 os.system(cmd1)
 
+# Nodes
 os.system('openstack server list>./all/nodes')
 with open("./all/nodes") as f:
-    if proxy not in f.read():
+    if proxy1 not in f.read():
         cmd = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
-            fl, key, net, proxy)
+            fl, key, net, proxy1)
+        os.system(cmd)
+    if proxy2 not in f.read():
+        cmd = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
+            fl, key, net, proxy2)
         os.system(cmd)
 with open("./all/nodes") as f:
     if bastion not in f.read():
@@ -99,7 +106,7 @@ with open("./all/floating_ip1") as f:
 
 
 # adding floating ip
-c = 'openstack server add floating ip {} {}'.format(proxy, fip1)
+c = 'openstack server add floating ip {} {}'.format(proxy1, fip1)
 os.system(c)
 cc = 'openstack server add floating ip {} {}'.format(bastion, fip2)
 os.system(cc)
@@ -119,12 +126,18 @@ with open("./all/hosts", 'a+') as f:
     with open("./all/ssh_config", 'a+') as s:
         s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
     # Add HAproxy server to hosts file
-    haproxy_ip = subprocess.check_output("openstack server list | grep 'p-tag-HAproxy' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
-    haproxy = f"p-tag-HAproxy ansible_host={haproxy_ip}"
-    f.write(f"{GROUP_HAPROXY}\n{haproxy}\n")
+    haproxy_ip = subprocess.check_output("openstack server list | grep 'p-tag-proxy1' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
+    haproxy = f"p-tag-proxy1 ansible_host={haproxy_ip}"
+    haproxy_ip1 = subprocess.check_output("openstack server list | grep 'p-tag-proxy2' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
+    haproxy1 = f"p-tag-proxy2 ansible_host={haproxy_ip1}"
+    pub_ip = subprocess.check_output("openstack server list | grep 'p-tag-proxy1' | cut -d'|' -f5 | cut -d',' -f2", shell=True).decode('utf-8').strip()
+    f.write(f"{'Public'}\n{'p-tag-proxy3 ansible_host='}{pub_ip}\n")
+    f.write("\n")
+    f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n")
     f.write("\n")
     with open("./all/ssh_config", 'a+') as s:
         s.write(f"{'Host '}{haproxy_ip}\n{'  HostName '}{haproxy_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+        s.write(f"{'Host '}{haproxy_ip1}\n{'  HostName '}{haproxy_ip1}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
     # Add web servers to hosts file
     web_servers = subprocess.check_output(
         "openstack server list | grep 'p-tag-node' | cut -d'|' -f5 | cut -d'=' -f2", shell=True).decode('utf-8').strip().split('\n')

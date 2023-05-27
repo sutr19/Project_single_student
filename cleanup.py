@@ -3,7 +3,7 @@ import os
 from sys import argv
 import time
 
-
+print("Removing all resources.........\n")
 # delete key
 os.system("openstack keypair delete p-key")
 
