@@ -1,2 +1,4 @@
-| 14bc9653-e1a2-4ad1-9788-9c67c0e82432 | p-tag-node3   | ACTIVE | p-network=10.0.1.8                 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
-| bda7a6c6-2632-4240-a743-129cb42b21a0 | p-tag-node2   | ACTIVE | p-network=10.0.1.24                | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+ p-tag-node3   
+ p-tag-bastion 
+ p-tag-proxy2  
+ p-tag-proxy1  
