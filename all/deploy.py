@@ -108,6 +108,8 @@ with open("./all/floating_ip1") as f:
 # adding floating ip
 c = 'openstack server add floating ip {} {}'.format(proxy1, fip1)
 os.system(c)
+ccc = 'openstack server add floating ip {} {}'.format(proxy2, fip1)
+os.system(ccc)
 cc = 'openstack server add floating ip {} {}'.format(bastion, fip2)
 os.system(cc)
 
@@ -130,8 +132,8 @@ with open("./all/hosts", 'a+') as f:
     haproxy = f"p-tag-proxy1 ansible_host={haproxy_ip}"
     haproxy_ip1 = subprocess.check_output("openstack server list | grep 'p-tag-proxy2' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
     haproxy1 = f"p-tag-proxy2 ansible_host={haproxy_ip1}"
-    pub_ip = subprocess.check_output("openstack server list | grep 'p-tag-proxy1' | cut -d'|' -f5 | cut -d',' -f2", shell=True).decode('utf-8').strip()
-    f.write(f"{'Public'}\n{'p-tag-proxy3 ansible_host='}{pub_ip}\n")
+   # pub_ip = subprocess.check_output("openstack server list | grep 'p-tag-proxy1' | cut -d'|' -f5 | cut -d',' -f2", shell=True).decode('utf-8').strip()
+    f.write(f"{'Public'}\n{'p-tag-proxy3 public_ip='}{fip1}\n")
     f.write("\n")
     f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n")
     f.write("\n")
