@@ -56,32 +56,32 @@ Host bastion
   User ubuntu
   IdentityFile ./all/private-key
   StrictHostKeyChecking no
-Host 10.0.1.27
-  HostName 10.0.1.27
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/private-key
-  StrictHostKeyChecking no
-Host 10.0.1.25
-  HostName 10.0.1.25
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/private-key
-  StrictHostKeyChecking no
 Host 10.0.1.10
   HostName 10.0.1.10
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/private-key
   StrictHostKeyChecking no
-Host 10.0.1.20                
-  HostName 10.0.1.20                
+Host 10.0.1.17
+  HostName 10.0.1.17
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/private-key
   StrictHostKeyChecking no
-Host 10.0.1.7                 
-  HostName 10.0.1.7                 
+Host 10.0.1.28
+  HostName 10.0.1.28
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
+Host 10.0.1.24                
+  HostName 10.0.1.24                
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
+Host 10.0.1.8                 
+  HostName 10.0.1.8                 
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/private-key

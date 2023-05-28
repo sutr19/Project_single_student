@@ -1,25 +1,5 @@
 ---
 - hosts: webservers
-  vars:
-    ansible_ssh_common_args: '-F ./all/ssh_config'
-  gather_facts: yes
-- hosts: Proxy
-  vars:
-    ansible_ssh_common_args: '-F ./all/ssh_config'
-  gather_facts: yes
-  become: yes
-  become_method: sudo
-
-  tasks:
-  - name: "configuring TCP and UDP"
-    template:
-        src: "nginx.j2"
-        dest: "/etc/nginx/nginx.conf"
-  - name: "restarting nginx"
-    service:
-       name: nginx
-       state: restarted
-- hosts: webservers
   gather_facts: yes
   become: yes
   become_method: sudo

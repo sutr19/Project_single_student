@@ -3,3 +3,5 @@
 1. install.sh: this deploys all required resources and services 
 2. operate.sh: manage the number of nodes 
 3. cleanup.py: clear all deployed resources 
+
+all folder containes suporting files

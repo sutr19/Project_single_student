@@ -14,11 +14,11 @@ with open("./all/servers.conf") as f:
     required_node = int(f.read())
 os.system('openstack server list | grep "p-tag-node" > ./all/nodes')
 global k
-word= '[webservers]'
+word = '[webservers]'
 with open('./all/hosts', 'r') as file:
     for line_num, line in enumerate(file, 1):
         if word in line:
-            k=line_num
+            k = line_num
 with open("./all/nodes") as f:
     lines = f.readlines()
     for line in lines:
@@ -63,18 +63,21 @@ else:
     to_del = exist_node-required_node
     i = 1
     while i <= to_del:
+        k = 1
         time.sleep(5)
         os.system('openstack server list | grep "p-tag-node" > ./all/nodes')
-        with open('./all/nodes') as n:
-            noden = node_name+str(i)
-            if noden in n.read():
-                cmd = "openstack server delete {}".format(noden)
-                rmnd = "grep -v {} ./all/hosts > temphost && mv temphost ./all/hosts".format(
-                    noden)
-                os.system(cmd)
-                os.system(rmnd)
-            else:
-                pass
+        while k<10:
+            with open('./all/nodes') as n:
+                noden = node_name+str(k)
+                if noden in n.read():
+                    cmd = "openstack server delete {}".format(noden)
+                    rmnd = "grep -v {} ./all/hosts > temphost && mv temphost ./all/hosts".format(
+                        noden)
+                    os.system(cmd)
+                    os.system(rmnd)
+                    break
+                else:
+                    k += 1
         i += 1
     else:
         pass
