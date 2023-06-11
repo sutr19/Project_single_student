@@ -11,7 +11,7 @@ subnet = 'subnet'
 router = 'router'
 proxy = 'proxy'
 bastion = 'bastion'
-security_group='securityg'
+security_group = 'securityg'
 node = 'node'
 fl = '1C-1GB-20GB'
 img = "Ubuntu 22.04.1 Jammy Jellyfish 230124"
@@ -76,40 +76,51 @@ if net not in existnet:
 else:
     print("Network '{}' already exists".format(net))
 
-#security group
-security_group=sys.argv[1]+"-"+security_group
-new_security=conn.network.create_security_group(name=security_group)
-conn.network.create_security_group_rule(
-    security_group_id=new_security.id,
-    direction='ingress',
-    ethertype='IPv4',
-    protocol='tcp',
-    port_range_min=22,
-    port_range_max=22
-)
-conn.network.create_security_group_rule(
-    security_group_id=new_security.id,
-    direction='ingress',
-    ethertype='IPv4',
-    protocol='tcp',
-    port_range_min=80,
-    port_range_max=80
-)
-for port in [53, 5000, 6000]:
+# security group
+security_group = sys.argv[1] + "-" + security_group
+existing_security = list(conn.network.find_security_group(name_or_id=security_group))
+
+if len(existing_security) == 0:
+    new_security = conn.network.create_security_group(name=security_group)
+    
     conn.network.create_security_group_rule(
         security_group_id=new_security.id,
         direction='ingress',
         ethertype='IPv4',
         protocol='tcp',
-        port_range_min=port,
-        port_range_max=port
+        port_range_min=22,
+        port_range_max=22
     )
-conn.network.create_security_group_rule(
-    security_group_id=new_security.id,
-    direction='ingress',
-    ethertype='IPv4',
-    protocol='icmp'
-)
+
+    conn.network.create_security_group_rule(
+        security_group_id=new_security.id,
+        direction='ingress',
+        ethertype='IPv4',
+        protocol='tcp',
+        port_range_min=80,
+        port_range_max=80
+    )
+
+    for port in [53, 5000, 6000]:
+        conn.network.create_security_group_rule(
+            security_group_id=new_security.id,
+            direction='ingress',
+            ethertype='IPv4',
+            protocol='tcp',
+            port_range_min=port,
+            port_range_max=port
+        )
+
+    conn.network.create_security_group_rule(
+        security_group_id=new_security.id,
+        direction='ingress',
+        ethertype='IPv4',
+        protocol='icmp'
+    )
+
+else:
+    print("Security_group '{}' already exists".format(security_group))
+
 # Nodes
 command1 = "openstack floating ip create ext-net -f json"
 output1 = subprocess.check_output(command1, shell=True).decode('utf-8')
@@ -122,7 +133,7 @@ flavor = conn.compute.find_flavor(fl)
 network = conn.network.find_network(net)
 proxy = sys.argv[1] + "-" + proxy
 bastion = sys.argv[1]+"-"+bastion
-node=sys.argv[1]+"-"+node
+node = sys.argv[1]+"-"+node
 # Check if server proxy1 exists
 i = 1
 while i <= 2:
@@ -130,15 +141,23 @@ while i <= 2:
     existser = list(conn.compute.servers(name=prox))
     if len(existser) == 0:
         server = conn.compute.create_server(
-            name=prox, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}],
-            security_groups=[new_security.id]
+            name=prox,
+            image_id=image.id,
+            flavor_id=flavor.id,
+            key_name=key_name,
+            networks=[{"uuid": network.id}]
+            
         )
         conn.compute.wait_for_server(server)
         # Attach a tag to proxy
+        
         metadata = {"tag": sys.argv[1]}
         conn.compute.set_server_metadata(server, **metadata)
-        command = "openstack server add floating ip {} {}".format(server.id, floating_ip1)
+        command = "openstack server add floating ip {} {}".format(
+            server.id, floating_ip1)
         subprocess.check_output(command, shell=True)
+        add_security_group_command = "openstack server add security group {} {}".format(server.id, security_group)
+        subprocess.check_output(add_security_group_command, shell=True)
     else:
         print("Server '{}' already exists".format(prox))
     i += 1
@@ -148,15 +167,18 @@ else:
 existbastion = list(conn.compute.servers(name=bastion))
 if len(existbastion) == 0:
     srvb = conn.compute.create_server(
-        name=bastion, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}],
-        security_groups=[new_security.id]
+        name=bastion, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[
+            {"uuid": network.id}]
     )
     conn.compute.wait_for_server(srvb)
     # Attach a tag to proxy2
     metadata = {"tag": sys.argv[1]}
     conn.compute.set_server_metadata(srvb, **metadata)
-    command = "openstack server add floating ip {} {}".format(srvb.id, floating_ip2)
+    command = "openstack server add floating ip {} {}".format(
+        srvb.id, floating_ip2)
     subprocess.check_output(command, shell=True)
+    add_security_group_command = "openstack server add security group {} {}".format(srvb.id, security_group)
+    subprocess.check_output(add_security_group_command, shell=True)
 else:
     print("Server '{}' already exists".format(bastion))
 # creating worker nodes
@@ -166,13 +188,13 @@ while k <= 3:
     existnode = list(conn.compute.servers(name=nod))
     if len(existnode) == 0:
         nods = conn.compute.create_server(
-            name=nod, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}],
-            security_groups=[new_security.id]
-        )
+            name=nod, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}])
         conn.compute.wait_for_server(nods)
         # Attach a tag to proxy
         metadata = {"tag": sys.argv[1]}
         conn.compute.set_server_metadata(nods, **metadata)
+        add_security_group_command = "openstack server add security group {} {}".format(nods.id, security_group)
+        subprocess.check_output(add_security_group_command, shell=True)
     else:
         print("Server '{}' already exists".format(nod))
     k += 1
@@ -185,8 +207,10 @@ else:
     pass
 with open("./all/hosts", 'a+') as f:
     # Add bastion server to hosts file
-    command = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2".format(bastion)
-    bastion_ip = subprocess.check_output(command, shell=True).decode('utf-8').strip()
+    command = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2".format(
+        bastion)
+    bastion_ip = subprocess.check_output(
+        command, shell=True).decode('utf-8').strip()
 
     bss = f"{bastion} ansible_host={bastion_ip}"
     f.write(f"{BASTION_HOST}\n{bss}\n")
@@ -196,13 +220,19 @@ with open("./all/hosts", 'a+') as f:
 # Add HAproxy server to hosts file
     hap = proxy + str(1)
     happ = proxy + str(2)
-    command4 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2".format(happ)
-    pub_ip = subprocess.check_output(command4, shell=True).decode('utf-8').strip()
-    command1 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(hap)
-    command2 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(happ)
-    haproxy_ip = subprocess.check_output(command1, shell=True).decode('utf-8').strip()
+    command4 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2".format(
+        happ)
+    pub_ip = subprocess.check_output(
+        command4, shell=True).decode('utf-8').strip()
+    command1 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(
+        hap)
+    command2 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(
+        happ)
+    haproxy_ip = subprocess.check_output(
+        command1, shell=True).decode('utf-8').strip()
     haproxy = f"{hap} ansible_host={haproxy_ip}"
-    haproxy_ip1 = subprocess.check_output(command2, shell=True).decode('utf-8').strip()
+    haproxy_ip1 = subprocess.check_output(
+        command2, shell=True).decode('utf-8').strip()
     haproxy1 = f"{happ} ansible_host={haproxy_ip1}"
     f.write(f"[Public]\ntag-proxy3 public_ip={pub_ip}\n\n")
     f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n\n")
@@ -213,12 +243,15 @@ with open("./all/hosts", 'a+') as f:
         s.write(f"Host {haproxy_ip}\n  HostName {haproxy_ip}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile {private_key_file}\n  StrictHostKeyChecking no\n")
         s.write(f"Host {haproxy_ip1}\n  HostName {haproxy_ip1}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile {private_key_file}\n  StrictHostKeyChecking no\n")
    # Add web servers to hosts file
-    command3 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2".format(node)
-    web_servers = subprocess.check_output(command3, shell=True).decode('utf-8').strip().split('\n')
+    command3 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2".format(
+        node)
+    web_servers = subprocess.check_output(
+        command3, shell=True).decode('utf-8').strip().split('\n')
     f.write(f"{GROUP_WEBSERVERS}\n")
 
     for server in web_servers:
-        node_ip = subprocess.check_output(f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip()
+        node_ip = subprocess.check_output(
+            f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip()
         node_ips.append(node_ip)
 
     node_ips.sort()
@@ -228,10 +261,11 @@ with open("./all/hosts", 'a+') as f:
                 if subprocess.check_output(f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip() == node_ip:
                     node = f"{node_ip} ansible_host={server}"
                     if node not in f.read():
-                         f.write(f"{node}\n")
-                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile '}{private_key_file}\n{'  StrictHostKeyChecking no'}\n")#
+                        f.write(f"{node}\n")
+                        s.write(
+                            f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile '}{private_key_file}\n{'  StrictHostKeyChecking no'}\n")
 
                     else:
-                      pass
+                        pass
         f.write("\n")
     f.write(f"{GROUP_ALL_VARS}\n{'ansible_user=ubuntu'}\n")
