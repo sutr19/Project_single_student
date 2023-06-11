@@ -16,12 +16,12 @@ fl = '1C-1GB-20GB'
 img = "Ubuntu 22.04.1 Jammy Jellyfish 230124"
 
 
-# GROUP_HAPROXY = "[Proxy]"
-# GROUP_WEBSERVERS = "[webservers]"
-# GROUP_ALL_VARS = "[all:vars]"
-# BASTION_HOST = "[Bastion]"
-# Web_Varr = "[webservers:vars]"
-# node_ips = []
+GROUP_HAPROXY = "[Proxy]"
+GROUP_WEBSERVERS = "[webservers]"
+GROUP_ALL_VARS = "[all:vars]"
+BASTION_HOST = "[Bastion]"
+Web_Varr = "[webservers:vars]"
+node_ips = []
 conn = openstack.connect()
 
 keyp = [keypair.name for keypair in conn.compute.keypairs()]
@@ -50,7 +50,7 @@ if net not in existnet:
     conn.network.set_tags(newnet, tags)
     # create subnet
     new_subnet = conn.network.create_subnet(
-        network_id=newnet.id, name=subnet, cidr="10.0.1.0/24", ip_version=4)
+        network_id=newnet.id, name=subnet, cidr="10.0.1.0/26", ip_version=4)
     conn.network.set_tags(new_subnet, tags)
 
     # create router
@@ -78,6 +78,7 @@ else:
 # Nodes
 command1 = "openstack floating ip create ext-net -f json"
 output1 = subprocess.check_output(command1, shell=True).decode('utf-8')
+floating_ip1 = json.loads(output1)['floating_ip_address']
 command2 = "openstack floating ip create ext-net -f json"
 output2 = subprocess.check_output(command2, shell=True).decode('utf-8')
 floating_ip2 = json.loads(output2)['floating_ip_address']
@@ -100,7 +101,7 @@ while i <= 2:
         # Attach a tag to proxy
         metadata = {"tag": sys.argv[1]}
         conn.compute.set_server_metadata(server, **metadata)
-        command = "openstack server add floating ip {} {}".format(server.id, floating_ip2)
+        command = "openstack server add floating ip {} {}".format(server.id, floating_ip1)
         subprocess.check_output(command, shell=True)
     else:
         print("Server '{}' already exists".format(prox))
@@ -139,96 +140,53 @@ while k <= 3:
     k += 1
 else:
     pass
+print("Creating inventory file. Please wait patiently!\n")
+if os.path.exists("./all/hosts"):
+    os.remove("./all/hosts")
+else:
+    pass
+with open("./all/hosts", 'a+') as f:
+    # Add bastion server to hosts file
+    bastion_ip = subprocess.check_output("openstack server list | grep {bastion} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2", shell=True).decode('utf-8').strip()
 
-# os.system('openstack server list>./all/nodes')
-# with open("./all/nodes") as f:
-#    if proxy1 not in f.read():
-#        cmd = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
-#            fl, key, net, proxy1)
-#        os.system(cmd)
-#    if proxy2 not in f.read():
-#        cmd = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
-#            fl, key, net, proxy2)
-#        os.system(cmd)
-# with open("./all/nodes") as f:
-#    if bastion not in f.read():
-#        cmd1 = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
-#            fl, key, net, bastion)
-#        os.system(cmd1)
-
-# k = 1
-# while k <= 3:
-#    os.system('openstack server list>./all/nodes')
-#    with open("./all/nodes") as f:
-#        nod = node+str(k)
-#        if nod not in f.read():
-#            cmd2 = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
-#                fl, key, net, nod)
-#            os.system(cmd2)
-#    k += 1
-# floating ip
-# os.system("openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > ./all/floating_ip")
-# with open("./all/floating_ip") as f:
-#    fip1 = f.read()
-# os.system("openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > ./all/floating_ip1")
-# with open("./all/floating_ip1") as f:
-#    fip2 = f.read()
-
-
-# adding floating ip
-# c = 'openstack server add floating ip {} {}'.format(proxy1, fip1)
-# os.system(c)
-# ccc = 'openstack server add floating ip {} {}'.format(proxy2, fip1)
-# os.system(ccc)
-# cc = 'openstack server add floating ip {} {}'.format(bastion, fip2)
-# os.system(cc)
-
-# print("Creating inventory file. Please wait patiently!\n")
-# if os.path.exists("./all/hosts"):
-#    os.remove("./all/hosts")
-# else:
-#    pass
-# with open("./all/hosts", 'a+') as f:
-#    # Add bastion server to hosts file
-#    bastion_ip = subprocess.check_output("openstack server list | grep 'p-tag-bastion' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2", shell=True).decode('utf-8').strip()
-#
-#    bss = f"p-tag-bastion ansible_host={bastion_ip}"
-#    f.write(f"{BASTION_HOST}\n{bss}\n")
-#    f.write("\n")
-#    with open("./all/ssh_config", 'a+') as s:
-#        s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+    bss = f"p-tag-bastion ansible_host={bastion_ip}"
+    f.write(f"{BASTION_HOST}\n{bss}\n")
+    f.write("\n")
+    with open("./all/ssh_config", 'a+') as s:
+        s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
 # Add HAproxy server to hosts file
-#    haproxy_ip = subprocess.check_output("openstack server list | grep 'p-tag-proxy1' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
-#    haproxy = f"p-tag-proxy1 ansible_host={haproxy_ip}"
-#    haproxy_ip1 = subprocess.check_output("openstack server list | grep 'p-tag-proxy2' | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
-#    haproxy1 = f"p-tag-proxy2 ansible_host={haproxy_ip1}"
-#   # pub_ip = subprocess.check_output("openstack server list | grep 'p-tag-proxy1' | cut -d'|' -f5 | cut -d',' -f2", shell=True).decode('utf-8').strip()
-#    f.write(f"{'Public'}\n{'p-tag-proxy3 public_ip='}{fip1}\n")
-#    f.write("\n")
-#    f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n")
-#    f.write("\n")
-#    with open("./all/ssh_config", 'a+') as s:
-#        s.write(f"{'Host '}{haproxy_ip}\n{'  HostName '}{haproxy_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
-#        s.write(f"{'Host '}{haproxy_ip1}\n{'  HostName '}{haproxy_ip1}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
-#    # Add web servers to hosts file
-#    web_servers = subprocess.check_output(
-#        "openstack server list | grep 'p-tag-node' | cut -d'|' -f5 | cut -d'=' -f2", shell=True).decode('utf-8').strip().split('\n')
-#    f.write(f"{GROUP_WEBSERVERS}\n")
-#    for server in web_servers:
-#        node_ip = subprocess.check_output(
-#            f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip()
-#        node_ips.append(node_ip)
-#    node_ips.sort()
-#    with open("./all/ssh_config", 'a+') as s:
-#        for node_ip in node_ips:
-#            for server in web_servers:
-#                if subprocess.check_output(f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip() == node_ip:
-#                    node = f"{node_ip} ansible_host={server}"
-#                    if node not in f.read():
-#                         f.write(f"{node}\n")
-#                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")#
+    hap=proxy+str(1)
+    happ=proxy+str(2)
+    haproxy_ip = subprocess.check_output("openstack server list | grep {hap} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
+    haproxy = f"p-tag-proxy1 ansible_host={haproxy_ip}"
+    haproxy_ip1 = subprocess.check_output("openstack server list | grep {happ} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
+    haproxy1 = f"p-tag-proxy2 ansible_host={haproxy_ip1}"
+    f.write(f"{'Public'}\n{'p-tag-proxy3 public_ip='}{floating_ip1}\n")
+    f.write("\n")
+    f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n")
+    f.write("\n")
+    with open("./all/ssh_config", 'a+') as s:
+       s.write(f"{'Host '}{haproxy_ip}\n{'  HostName '}{haproxy_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+       s.write(f"{'Host '}{haproxy_ip1}\n{'  HostName '}{haproxy_ip1}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+   # Add web servers to hosts file
+    web_servers = subprocess.check_output(
+        "openstack server list | grep {node} | cut -d'|' -f5 | cut -d'=' -f2", shell=True).decode('utf-8').strip().split('\n')
+    f.write(f"{GROUP_WEBSERVERS}\n")
+    for server in web_servers:
+        node_ip = subprocess.check_output(
+            f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip()
+        node_ips.append(node_ip)
+    node_ips.sort()
+    with open("./all/ssh_config", 'a+') as s:
+        for node_ip in node_ips:
+            for server in web_servers:
+                if subprocess.check_output(f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip() == node_ip:
+                    node = f"{node_ip} ansible_host={server}"
+                    if node not in f.read():
+                         f.write(f"{node}\n")
+                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")#
 
-#                   else:
-# pass
-#       f.write("\n")
-#   f.write(f"{GROUP_ALL_VARS}\n{'ansible_user=ubuntu'}\n")
+                    else:
+                      pass
+        f.write("\n")
+    f.write(f"{GROUP_ALL_VARS}\n{'ansible_user=ubuntu'}\n")
