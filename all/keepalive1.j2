@@ -9,19 +9,19 @@ vrrp_instance VI_1 {
         auth_pass 1234
     }
     virtual_ipaddress {
-        {{ hostvars['p-tag-proxy3']['public_ip'] }}/32 dev ens3
+        {{ hostvars['tag-proxy3']['public_ip'] }}/32 dev ens3
     }
 }
 
-virtual_server {{ hostvars['p-tag-proxy3']['public_ip'] }} 80 {
+virtual_server {{ hostvars['tag-proxy3']['public_ip'] }} 80 {
     delay_loop 6
     lb_algo rr
     lb_kind NAT
     persistence_timeout 50
     protocol TCP
 
-    real_server {{ hostvars['p-tag-proxy1']['ansible_default_ipv4']['address'] }}
- 80 {
+    {% for host in groups['Proxy'] %}
+    real_server {{ hostvars[host]['ansible_default_ipv4']['address'] }} 80 {
         weight 1
         TCP_CHECK {
             connect_timeout 10
@@ -29,17 +29,5 @@ virtual_server {{ hostvars['p-tag-proxy3']['public_ip'] }} 80 {
             delay_before_retry 3
         }
     }
-
-    real_server {{ hostvars['p-tag-proxy2']['ansible_default_ipv4']['address'] }}
- {
-        weight 1
-        TCP_CHECK {
-            connect_timeout 10
-            retry 3
-            delay_before_retry 3
-        }
-    }
+    {% endfor %}
 }
-
-
-

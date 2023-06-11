@@ -159,14 +159,18 @@ with open("./all/hosts", 'a+') as f:
 # Add HAproxy server to hosts file
     hap = proxy + str(1)
     happ = proxy + str(2)
+    command4 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2".format(happ)
+    pub_ip = subprocess.check_output(command4, shell=True).decode('utf-8').strip()
     command1 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(hap)
     command2 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(happ)
     haproxy_ip = subprocess.check_output(command1, shell=True).decode('utf-8').strip()
     haproxy = f"{hap} ansible_host={haproxy_ip}"
     haproxy_ip1 = subprocess.check_output(command2, shell=True).decode('utf-8').strip()
     haproxy1 = f"{happ} ansible_host={haproxy_ip1}"
-    f.write(f"Public\ntag-proxy3 public_ip={floating_ip1}\n\n")
+    f.write(f"[Public]\ntag-proxy3 public_ip={pub_ip}\n\n")
     f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n\n")
+    f.write(f"[Proxy1]\n{haproxy}\n\n")
+    f.write(f"[Proxy2]\n{haproxy1}\n\n")
 
     with open("./all/ssh_config", 'a+') as s:
         s.write(f"Host {haproxy_ip}\n  HostName {haproxy_ip}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile {private_key_file}\n  StrictHostKeyChecking no\n")

@@ -34,7 +34,7 @@
     package:
       name: keepalived
       state: present 
-- hosts: p-tag-proxy1
+- hosts: Proxy1
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
@@ -57,7 +57,7 @@
     service:
       name: nginx
       state: reloaded
-- hosts: p-tag-proxy2
+- hosts: Proxy2
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes

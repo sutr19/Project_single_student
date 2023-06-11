@@ -9,6 +9,6 @@ vrrp_instance VI_1 {
         auth_pass 1234
     }
     virtual_ipaddress {
-        {{ hostvars['p-tag-proxy3']['public_ip'] }}/32 dev ens3
+        {{ hostvars['tag-proxy3']['public_ip'] }}/32 dev ens3
     }
 }
