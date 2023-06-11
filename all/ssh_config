@@ -52,24 +52,36 @@ Host *
     HashKnownHosts yes
     GSSAPIAuthentication yes
 Host bastion
-  HostName 
+  HostName 188.95.226.75
   User ubuntu
   IdentityFile ./all/private-key
   StrictHostKeyChecking no
-Host 
-  HostName 
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/private-key
-  StrictHostKeyChecking no
-Host 
-  HostName 
+Host 10.0.1.8
+  HostName 10.0.1.8
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/private-key
   StrictHostKeyChecking no
-Host 
-  HostName 
+Host 10.0.1.30
+  HostName 10.0.1.30
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
+Host 10.0.1.55
+  HostName 10.0.1.55
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
+Host 10.0.1.20                
+  HostName 10.0.1.20                
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
+Host 10.0.1.45                
+  HostName 10.0.1.45                
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/private-key

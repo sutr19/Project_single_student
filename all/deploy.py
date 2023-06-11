@@ -4,7 +4,7 @@ import json
 import subprocess
 import openstack
 import os
-# variables
+# variable
 key = 'key'
 net = 'network'
 subnet = 'subnet'
@@ -22,6 +22,7 @@ GROUP_ALL_VARS = "[all:vars]"
 BASTION_HOST = "[Bastion]"
 Web_Varr = "[webservers:vars]"
 node_ips = []
+print("Deploying Network Please wait patiently!\n")
 conn = openstack.connect()
 
 keyp = [keypair.name for keypair in conn.compute.keypairs()]
@@ -147,35 +148,38 @@ else:
     pass
 with open("./all/hosts", 'a+') as f:
     # Add bastion server to hosts file
-    bastion_ip = subprocess.check_output("openstack server list | grep {bastion} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2", shell=True).decode('utf-8').strip()
+    command = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2".format(bastion)
+    bastion_ip = subprocess.check_output(command, shell=True).decode('utf-8').strip()
 
-    bss = f"p-tag-bastion ansible_host={bastion_ip}"
+    bss = f"{bastion} ansible_host={bastion_ip}"
     f.write(f"{BASTION_HOST}\n{bss}\n")
     f.write("\n")
     with open("./all/ssh_config", 'a+') as s:
         s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
 # Add HAproxy server to hosts file
-    hap=proxy+str(1)
-    happ=proxy+str(2)
-    haproxy_ip = subprocess.check_output("openstack server list | grep {hap} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
-    haproxy = f"p-tag-proxy1 ansible_host={haproxy_ip}"
-    haproxy_ip1 = subprocess.check_output("openstack server list | grep {happ} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1", shell=True).decode('utf-8').strip()
-    haproxy1 = f"p-tag-proxy2 ansible_host={haproxy_ip1}"
-    f.write(f"{'Public'}\n{'p-tag-proxy3 public_ip='}{floating_ip1}\n")
-    f.write("\n")
-    f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n")
-    f.write("\n")
+    hap = proxy + str(1)
+    happ = proxy + str(2)
+    command1 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(hap)
+    command2 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1".format(happ)
+    haproxy_ip = subprocess.check_output(command1, shell=True).decode('utf-8').strip()
+    haproxy = f"{hap} ansible_host={haproxy_ip}"
+    haproxy_ip1 = subprocess.check_output(command2, shell=True).decode('utf-8').strip()
+    haproxy1 = f"{happ} ansible_host={haproxy_ip1}"
+    f.write(f"Public\ntag-proxy3 public_ip={floating_ip1}\n\n")
+    f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n\n")
+
     with open("./all/ssh_config", 'a+') as s:
-       s.write(f"{'Host '}{haproxy_ip}\n{'  HostName '}{haproxy_ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
-       s.write(f"{'Host '}{haproxy_ip1}\n{'  HostName '}{haproxy_ip1}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+        s.write(f"Host {haproxy_ip}\n  HostName {haproxy_ip}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile ./all/private-key\n  StrictHostKeyChecking no\n")
+        s.write(f"Host {haproxy_ip1}\n  HostName {haproxy_ip1}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile ./all/private-key\n  StrictHostKeyChecking no\n")
    # Add web servers to hosts file
-    web_servers = subprocess.check_output(
-        "openstack server list | grep {node} | cut -d'|' -f5 | cut -d'=' -f2", shell=True).decode('utf-8').strip().split('\n')
+    command3 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2".format(node)
+    web_servers = subprocess.check_output(command3, shell=True).decode('utf-8').strip().split('\n')
     f.write(f"{GROUP_WEBSERVERS}\n")
+
     for server in web_servers:
-        node_ip = subprocess.check_output(
-            f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip()
+        node_ip = subprocess.check_output(f"openstack server list | grep {server} | cut -d'|' -f3", shell=True).decode('utf-8').strip()
         node_ips.append(node_ip)
+
     node_ips.sort()
     with open("./all/ssh_config", 'a+') as s:
         for node_ip in node_ips:
