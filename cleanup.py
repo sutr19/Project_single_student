@@ -4,6 +4,11 @@ from sys import argv
 import openstack
 import subprocess
 
+
+net = 'network'
+subnet1 = 'subnet'
+router1 = 'router'
+
 print("Removing all resources.........\n")
 command = ". {}".format(argv[1])  
 subprocess.call(command, shell=True)
@@ -19,43 +24,31 @@ floating_ips = conn.network.ips()
 for floating_ip in floating_ips:
     conn.network.delete_ip(floating_ip)
 
-
-# unset external gateway
+#unset external gateway
 routers = conn.network.routers()
 for router in routers:
     if router.external_gateway_info:
         conn.network.remove_gateway_from_router(router)
         break
 
-# Delete routers
-for router in routers:
-    conn.network.delete_router(router)
-
-# Delete subnets
-subnets = conn.network.subnets()
-for subnet in subnets:
-    conn.network.delete_subnet(subnet)
-#os.system("openstack router unset --external-gateway --tag p-tag p-router")
-#os.system("openstack router remove subnet p-router p-subnet")
-#os.system("openstack router delete p-router")
+# Remove subnet and delete router
+router1=argv[2]+"-"+router1
+subnet1=argv[2]+"-"+subnet1
+os.system("openstack router unset --external-gateway --tag {} {}".format(argv[2], router1))
+os.system("openstack router remove subnet {} {}".format(router1, subnet1))
+os.system("openstack router delete {}".format(router1))
 
 
 # deleting nodes
-#os.system('openstack server list | grep "p-tag" | cut -d"|" -f"3" >./all/nodes')
-#with open("./all/nodes") as f:
-#    for line in f:
-#        cmd = 'openstack server delete {}'.format(line)
-#        os.system(cmd)
-#os.system('grep -v "10.0.1" hosts > temphost && mv temphost hosts')   
-#os.system('grep -v "ansible_ssh_common_args=" hosts > temphost && mv temphost hosts')
+instances = conn.compute.servers()
 
-# delete subnet pool and subnet
-#os.system("openstack subnet  delete p-subnet")
-#os.system("openstack subnet pool delete p-pool")
+# Iterate over the instances and delete them
+for instance in instances:
+    conn.compute.delete_server(instance.id)
 
 
 # delete network
-#os.system("openstack network delete p-network")
+os.system("openstack network delete {}".format(subnet1))
 
 # delete security group
 #os.system("openstack security group delete p-security")
