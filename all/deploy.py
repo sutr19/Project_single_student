@@ -7,11 +7,12 @@ import os
 # variables
 key = 'key'
 net = 'network'
+# subpool = 'p-pool'
 subnet = 'subnet'
 router = 'router'
 # secgroup = 'p-security'
-proxy = 'proxy'
-bastion = 'bastion'
+proxy = 'proxy1'
+bastion = 'p-tag-bastion'
 node = 'node'
 fl = '1C-1GB-20GB'
 img = "Ubuntu 22.04.1 Jammy Jellyfish 230124"
@@ -77,6 +78,11 @@ else:
 
 
 # Nodes
+command1 = "openstack floating ip create ext-net -f json"
+output1 = subprocess.check_output(command1, shell=True).decode('utf-8')
+command2 = "openstack floating ip create ext-net -f json"
+output2 = subprocess.check_output(command2, shell=True).decode('utf-8')
+floating_ip2 = json.loads(output2)['floating_ip_address']
 image = conn.compute.find_image(img)
 flavor = conn.compute.find_flavor(fl)
 network = conn.network.find_network(net)
@@ -101,6 +107,39 @@ while i <= 2:
     i += 1
 else:
     pass
+# Check if bastion exists# Nodes
+command1 = "openstack floating ip create ext-net -f json"
+output1 = subprocess.check_output(command1, shell=True).decode('utf-8')
+floating_ip1 = json.loads(output1)['floating_ip_address']
+command2 = "openstack floating ip create ext-net -f json"
+output2 = subprocess.check_output(command2, shell=True).decode('utf-8')
+floating_ip2 = json.loads(output2)['floating_ip_address']
+image = conn.compute.find_image(img)
+flavor = conn.compute.find_flavor(fl)
+network = conn.network.find_network(net)
+proxy = sys.argv[1] + "-" + proxy
+bastion = sys.argv[1]+"-"+bastion
+node=sys.argv[1]+"-"+node
+# Check if server proxy1 exists
+i = 1
+while i <= 2:
+    prox = proxy + str(i)
+    existser = list(conn.compute.servers(name=prox))
+    if len(existser) == 0:
+        server = conn.compute.create_server(
+            name=prox, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}]
+        )
+        conn.compute.wait_for_server(server)
+        # Attach a tag to proxy
+        metadata = {"tag": sys.argv[1]}
+        conn.compute.set_server_metadata(server, **metadata)
+        command = "openstack server add floating ip {} {}".format(server.id, floating_ip1)
+        subprocess.check_output(command, shell=True)
+    else:
+        print("Server '{}' already exists".format(prox))
+    i += 1
+else:
+    pass
 # Check if bastion exists
 existbastion = list(conn.compute.servers(name=bastion))
 if len(existbastion) == 0:
@@ -111,6 +150,8 @@ if len(existbastion) == 0:
     # Attach a tag to proxy2
     metadata = {"tag": sys.argv[1]}
     conn.compute.set_server_metadata(srvb, **metadata)
+    command = "openstack server add floating ip {} {}".format(srvb.id, floating_ip2)
+    subprocess.check_output(command, shell=True)
 else:
     print("Server '{}' already exists".format(bastion))
 # creating worker nodes
@@ -131,15 +172,70 @@ while k <= 3:
     k += 1
 else:
     pass
+existbastion = list(conn.compute.servers(name=bastion))
+if len(existbastion) == 0:
+    srvb = conn.compute.create_server(
+        name=bastion, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}]
+    )
+    conn.compute.wait_for_server(srvb)
+    # Attach a tag to proxy2
+    metadata = {"tag": sys.argv[1]}
+    conn.compute.set_server_metadata(srvb, **metadata)
+    command = "openstack server add floating ip {} {}".format(srvb.id, floating_ip2)
+    subprocess.check_output(command, shell=True)
+else:
+    print("Server '{}' already exists".format(bastion))
+# creating worker nodes
+k = 1
+while k <= 3:
+    nod = node + str(k)
+    existnode = list(conn.compute.servers(name=nod))
+    if len(existnode) == 0:
+        nods = conn.compute.create_server(
+            name=nod, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}]
+        )
+        conn.compute.wait_for_server(nods)
+        # Attach a tag to proxy
+        metadata = {"tag": sys.argv[1]}
+        conn.compute.set_server_metadata(nods, **metadata)
+    else:
+        print("Server '{}' already exists".format(nod))
+    k += 1
+else:
+    pass
+# os.system('openstack server list>./all/nodes')
+# with open("./all/nodes") as f:
+#    if proxy1 not in f.read():
+#        cmd = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
+#            fl, key, net, proxy1)
+#        os.system(cmd)
+#    if proxy2 not in f.read():
+#        cmd = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
+#            fl, key, net, proxy2)
+#        os.system(cmd)
+# with open("./all/nodes") as f:
+#    if bastion not in f.read():
+#        cmd1 = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
+#            fl, key, net, bastion)
+#        os.system(cmd1)
+
+# k = 1
+# while k <= 3:
+#    os.system('openstack server list>./all/nodes')
+#    with open("./all/nodes") as f:
+#        nod = node+str(k)
+#        if nod not in f.read():
+#            cmd2 = 'openstack server create --image "Ubuntu 22.04.1 Jammy Jellyfish 230124" --flavor {} --key-name {} --network {}  {}'.format(
+#                fl, key, net, nod)
+#            os.system(cmd2)
+#    k += 1
 # floating ip
-command1 = "openstack floating ip create ext-net -f json"
-output1 = subprocess.check_output(command1, shell=True).decode('utf-8')
-floating_ip1 = json.loads(output1)['floating_ip_address']
-command2 = "openstack floating ip create ext-net -f json"
-output2 = subprocess.check_output(command2, shell=True).decode('utf-8')
-floating_ip2 = json.loads(output2)['floating_ip_address']
-#with open("./all/floating_ip", "w") as f:
- #   f.write(floating_ip1)
+# os.system("openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > ./all/floating_ip")
+# with open("./all/floating_ip") as f:
+#    fip1 = f.read()
+# os.system("openstack floating ip create ext-net -f json | jq -r '.floating_ip_address' > ./all/floating_ip1")
+# with open("./all/floating_ip1") as f:
+#    fip2 = f.read()
 
 
 # adding floating ip
