@@ -11,6 +11,7 @@ subnet = 'subnet'
 router = 'router'
 proxy = 'proxy'
 bastion = 'bastion'
+security_group='securityg'
 node = 'node'
 fl = '1C-1GB-20GB'
 img = "Ubuntu 22.04.1 Jammy Jellyfish 230124"
@@ -75,7 +76,40 @@ if net not in existnet:
 else:
     print("Network '{}' already exists".format(net))
 
-
+#security group
+security_group=sys.argv[1]+"-"+security_group
+new_security=conn.network.create_security_group(name=security_group)
+conn.network.create_security_group_rule(
+    security_group_id=new_security.id,
+    direction='ingress',
+    ethertype='IPv4',
+    protocol='tcp',
+    port_range_min=22,
+    port_range_max=22
+)
+conn.network.create_security_group_rule(
+    security_group_id=new_security.id,
+    direction='ingress',
+    ethertype='IPv4',
+    protocol='tcp',
+    port_range_min=80,
+    port_range_max=80
+)
+for port in [53, 5000, 6000]:
+    conn.network.create_security_group_rule(
+        security_group_id=new_security.id,
+        direction='ingress',
+        ethertype='IPv4',
+        protocol='tcp',
+        port_range_min=port,
+        port_range_max=port
+    )
+conn.network.create_security_group_rule(
+    security_group_id=new_security.id,
+    direction='ingress',
+    ethertype='IPv4',
+    protocol='icmp'
+)
 # Nodes
 command1 = "openstack floating ip create ext-net -f json"
 output1 = subprocess.check_output(command1, shell=True).decode('utf-8')
@@ -96,7 +130,8 @@ while i <= 2:
     existser = list(conn.compute.servers(name=prox))
     if len(existser) == 0:
         server = conn.compute.create_server(
-            name=prox, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}]
+            name=prox, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}],
+            security_groups=[new_security.id]
         )
         conn.compute.wait_for_server(server)
         # Attach a tag to proxy
@@ -113,7 +148,8 @@ else:
 existbastion = list(conn.compute.servers(name=bastion))
 if len(existbastion) == 0:
     srvb = conn.compute.create_server(
-        name=bastion, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}]
+        name=bastion, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}],
+        security_groups=[new_security.id]
     )
     conn.compute.wait_for_server(srvb)
     # Attach a tag to proxy2
@@ -130,7 +166,8 @@ while k <= 3:
     existnode = list(conn.compute.servers(name=nod))
     if len(existnode) == 0:
         nods = conn.compute.create_server(
-            name=nod, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}]
+            name=nod, image_id=image.id, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid": network.id}],
+            security_groups=[new_security.id]
         )
         conn.compute.wait_for_server(nods)
         # Attach a tag to proxy
