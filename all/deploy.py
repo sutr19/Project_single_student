@@ -155,7 +155,7 @@ with open("./all/hosts", 'a+') as f:
     f.write(f"{BASTION_HOST}\n{bss}\n")
     f.write("\n")
     with open("./all/ssh_config", 'a+') as s:
-        s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+        s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile '}{private_key_file}\n{'  StrictHostKeyChecking no'}\n")
 # Add HAproxy server to hosts file
     hap = proxy + str(1)
     happ = proxy + str(2)
@@ -169,8 +169,8 @@ with open("./all/hosts", 'a+') as f:
     f.write(f"{GROUP_HAPROXY}\n{haproxy}\n{haproxy1}\n\n")
 
     with open("./all/ssh_config", 'a+') as s:
-        s.write(f"Host {haproxy_ip}\n  HostName {haproxy_ip}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile ./all/private-key\n  StrictHostKeyChecking no\n")
-        s.write(f"Host {haproxy_ip1}\n  HostName {haproxy_ip1}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile ./all/private-key\n  StrictHostKeyChecking no\n")
+        s.write(f"Host {haproxy_ip}\n  HostName {haproxy_ip}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile {private_key_file}\n  StrictHostKeyChecking no\n")
+        s.write(f"Host {haproxy_ip1}\n  HostName {haproxy_ip1}\n  User ubuntu\n  ProxyJump bastion\n  IdentityFile {private_key_file}\n  StrictHostKeyChecking no\n")
    # Add web servers to hosts file
     command3 = "openstack server list | grep {} | cut -d'|' -f5 | cut -d'=' -f2".format(node)
     web_servers = subprocess.check_output(command3, shell=True).decode('utf-8').strip().split('\n')
@@ -188,7 +188,7 @@ with open("./all/hosts", 'a+') as f:
                     node = f"{node_ip} ansible_host={server}"
                     if node not in f.read():
                          f.write(f"{node}\n")
-                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")#
+                         s.write(f"{'Host '}{server}\n{'  HostName '}{server}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile '}{private_key_file}\n{'  StrictHostKeyChecking no'}\n")#
 
                     else:
                       pass

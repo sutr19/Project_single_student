@@ -2,7 +2,7 @@
 tag-bastion ansible_host=188.95.226.75
 
 Public
-tag-proxy3 public_ip=89.42.141.252
+tag-proxy3 public_ip=89.42.141.8
 
 [Proxy]
 tag-proxy1 ansible_host=10.0.1.8
