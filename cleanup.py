@@ -8,7 +8,7 @@ import subprocess
 net = 'network'
 subnet1 = 'subnet'
 router1 = 'router'
-
+security_group = 'securityg'
 print("Removing all resources.........\n")
 command = ". {}".format(argv[1])  
 subprocess.call(command, shell=True)
@@ -41,25 +41,34 @@ os.system("openstack router delete {}".format(router1))
 
 # deleting nodes
 instances = conn.compute.servers()
-
-# Iterate over the instances and delete them
 for instance in instances:
     conn.compute.delete_server(instance.id)
 
+# delete  subnet
+os.system("openstack subnet  delete {}".format(subnet1))
 
 # delete network
-os.system("openstack network delete {}".format(subnet1))
+net=argv[2]+"-"+net
+os.system("openstack network delete {}".format(net))
 
 # delete security group
-#os.system("openstack security group delete p-security")
+security_group=argv[2]+"-"+security_group
+os.system("openstack security group delete {}".format(security_group))
 
+#deleting privati key
+private_key_file = "./all/" + argv[3]
+if os.path.exists(private_key_file):
+    os.remove(private_key_file)
+else:
+    pass
+
+#deleting ssh_config
 def remove_lines(filename):
     with open(filename, 'r') as file:
         lines = file.readlines()
 
     with open(filename, 'w') as file:
-        file.writelines(lines[:53])  # Keep lines from 1 to 53 (inclusive)
+        file.writelines(lines[:53])  
 
-# Usage example
 filename = './all/ssh_config'  
 remove_lines(filename)

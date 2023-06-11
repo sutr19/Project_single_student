@@ -1,20 +1,29 @@
 #!/usr/bin/env python3
 import os
 import time
+import sys
+import openstack
+import subprocess
 
-node_name = 'p-tag-node'
+conn=openstack.connect()
+node_name = sys.argv[1]+"-"+'node'
 fl = '1C-1GB-20GB'
-key = 'p-key'
-net = 'p-network'
-secgroup = 'p-security'
+key = sys.argv[1]+"-"+'key'
+net = sys.argv[1]+"-"+'network'
+secgroup = sys.argv[1]+"-"+'security'
 img = 'Ubuntu 22.04.1 Jammy Jellyfish 230124'
+image = conn.compute.find_image(img)
+flavor = conn.compute.find_flavor(fl)
 loop = 0
 exist_node = 0
+private_key_file = "./all/" + sys.argv[2]
+
 with open("./all/servers.conf") as f:
     required_node = int(f.read())
 os.system('openstack server list | grep "p-tag-node" > ./all/nodes')
 global k
 word = '[webservers]'
+network = conn.network.find_network(net)
 with open('./all/hosts', 'r') as file:
     for line_num, line in enumerate(file, 1):
         if word in line:
@@ -28,24 +37,28 @@ if required_node > exist_node:
     while to_add > 0:
         i = 1
         kk = k
-        os.system('openstack server list | grep "p-tag-node" > ./all/nodes')
+        os.system('openstack server list | grep {} > ./all/nodes'.format(node_name))
         while True:
             with open('./all/nodes') as n:
                 noden = node_name+str(i)
                 if noden not in n.read():
-                    cmd = "openstack server create --image 'Ubuntu 22.04.1 Jammy Jellyfish 230124' --flavor {} --key-name {} --network {}  {}".format(
-                        fl, key, net,  noden)
-                    os.system(cmd)
-                    time.sleep(60/6)
+                    nods = conn.compute.create_server(
+                    name=noden, image_id=image.id, flavor_id=flavor.id, key_name=key, networks=[{"uuid": network.id}])
+                    conn.compute.wait_for_server(nods)
+                    # Attach a tag to proxy
+                    metadata = {"tag": sys.argv[1]}
+                    conn.compute.set_server_metadata(nods, **metadata)
+                    add_security_group_command = "openstack server add security group {} {}".format(nods.id, secgroup)
+                    subprocess.check_output(add_security_group_command, shell=True)
                     cmdip = 'openstack server list | grep {} | cut -d"|" -f"5" | cut -d"=" -f"2">./all/temp_ip'.format(
                         noden)
                     os.system(cmdip)
                     with open("./all/temp_ip") as f:
                         ip = f.read()
-                        ip1 = "p-tag-node"+str(i)+" ansible_host="+str(ip)
+                        ip1 = node_name+str(i)+" ansible_host="+str(ip)
                     with open("./all/ssh_config", 'a+') as s:
                         s.write(
-                            f"{'Host '}{ip}\n{'  HostName '}{ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile ./all/private-key'}\n{'  StrictHostKeyChecking no'}\n")
+                            f"{'Host '}{ip}\n{'  HostName '}{ip}\n{'  User ubuntu'}\n{'  ProxyJump bastion'}\n{'  IdentityFile '}{private_key_file}\n{'  StrictHostKeyChecking no'}\n")
                     with open("./all/hosts", 'r+') as b:
                         ll = b.readlines()
                         ll.insert(kk, ip1)
@@ -65,7 +78,7 @@ else:
     while i <= to_del:
         k = 1
         time.sleep(5)
-        os.system('openstack server list | grep "p-tag-node" > ./all/nodes')
+        os.system('openstack server list | grep {} > ./all/nodes'.format(node_name))
         while k<10:
             with open('./all/nodes') as n:
                 noden = node_name+str(k)
