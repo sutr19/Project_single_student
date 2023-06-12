@@ -10,7 +10,7 @@ node_name = sys.argv[1]+"-"+'node'
 fl = '1C-1GB-20GB'
 key = sys.argv[1]+"-"+'key'
 net = sys.argv[1]+"-"+'network'
-secgroup = sys.argv[1]+"-"+'security'
+secgroup = sys.argv[1]+"-"+'securityg'
 img = 'Ubuntu 22.04.1 Jammy Jellyfish 230124'
 image = conn.compute.find_image(img)
 flavor = conn.compute.find_flavor(fl)
@@ -20,7 +20,7 @@ private_key_file = "./all/" + sys.argv[2]
 
 with open("./all/servers.conf") as f:
     required_node = int(f.read())
-os.system('openstack server list | grep "p-tag-node" > ./all/nodes')
+os.system('openstack server list | grep {} > ./all/nodes'.format(node_name))
 global k
 word = '[webservers]'
 network = conn.network.find_network(net)
@@ -34,6 +34,7 @@ with open("./all/nodes") as f:
         exist_node += 1
 if required_node > exist_node:
     to_add = required_node-exist_node
+    print(to_add)
     while to_add > 0:
         i = 1
         kk = k

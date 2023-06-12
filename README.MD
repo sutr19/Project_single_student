@@ -5,3 +5,10 @@
 3. cleanup.py: clear all deployed resources 
 
 all folder containes suporting files
+
+proxy server listning ports:
+ 80 for http
+ 53 for SNMP
+working nodes listening ports
+5000 for http
+6000 for snmp

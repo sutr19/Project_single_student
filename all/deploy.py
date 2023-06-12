@@ -78,9 +78,9 @@ else:
 
 # security group
 security_group = sys.argv[1] + "-" + security_group
-existing_security = list(conn.network.find_security_group(name_or_id=security_group))
+existing_security = conn.network.find_security_group(name_or_id=security_group)
 
-if len(existing_security) == 0:
+if existing_security is None:
     new_security = conn.network.create_security_group(name=security_group)
     
     conn.network.create_security_group_rule(
@@ -117,9 +117,8 @@ if len(existing_security) == 0:
         ethertype='IPv4',
         protocol='icmp'
     )
-
 else:
-    print("Security_group '{}' already exists".format(security_group))
+    existing_security = [existing_security]
 
 # Nodes
 command1 = "openstack floating ip create ext-net -f json"
