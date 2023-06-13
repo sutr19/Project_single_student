@@ -8,7 +8,7 @@ import subprocess
 net = 'network'
 subnet1 = 'subnet'
 router1 = 'router'
-security_group = 'securityg'
+security_group = 'security'
 print("Removing all resources.........\n")
 # delete key
 conn = openstack.connect()
@@ -43,23 +43,18 @@ for instance in instances:
     conn.compute.delete_server(instance.id)
 
 # delete  subnet
-port_list_cmd = ["openstack", "port", "list", "--fixed-ip", f"subnet={subnet1}", "--format", "value", "-c", "ID"]
-port_ids = subprocess.run(port_list_cmd, capture_output=True, text=True).stdout.strip().split('\n')
-
-# Detach each port from the subnet
-for port_id in port_ids:
-    detach_cmd = ["openstack", "port", "unset", "--no-security-group", "--subnet", subnet1, port_id]
-    subprocess.run(detach_cmd)
-
+ports = conn.network.ports(fixed_ips='subnet={}'.format(subnet1))
+for port in ports:
+    for fixed_ip in port.fixed_ips:
+        if fixed_ip['subnet_id'] == subnet1:
+            port.fixed_ips.remove(fixed_ip)
+            break
+    conn.network.update_port(port)
 os.system("openstack subnet  delete {}".format(subnet1))
 
 # delete network
 net=argv[2]+"-"+net
 os.system("openstack network delete {}".format(net))
-
-# delete  subnet
-os.system("openstack subnet  delete {}".format(subnet1))
-
 # delete security group
 security_group=argv[2]+"-"+security_group
 os.system("openstack security group delete {}".format(security_group))
@@ -81,3 +76,4 @@ def remove_lines(filename):
 
 filename = './all/ssh_config'  
 remove_lines(filename)
+print("Cleaning completed!\n")
