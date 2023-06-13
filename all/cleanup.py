@@ -59,12 +59,6 @@ os.system("openstack network delete {}".format(net))
 security_group=argv[2]+"-"+security_group
 os.system("openstack security group delete {}".format(security_group))
 
-#deleting privati key
-private_key_file = "./all/" + argv[3]
-if os.path.exists(private_key_file):
-    os.remove(private_key_file)
-else:
-    pass
 
 #deleting ssh_config
 def remove_lines(filename):
