@@ -2,9 +2,9 @@
 # this project consists of among others three main files 
 1. install.sh: this deploys all required resources and services 
 2. operate.sh: manage the number of nodes 
-3. cleanup.py: clear all deployed resources 
+3. cleanup.sh: clear all deployed resources 
 
-all folder containes suporting files
+The folder named all containes suporting files
 
 proxy server listning ports:
  80 for http

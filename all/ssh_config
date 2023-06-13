@@ -86,3 +86,19 @@ Host 10.0.1.45
   ProxyJump bastion
   IdentityFile ./all/private-key
   StrictHostKeyChecking no
+Host 10.0.1.29                 
+
+  HostName 10.0.1.29                 
+
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
+Host 10.0.1.42                 
+
+  HostName 10.0.1.42                 
+
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/private-key
+  StrictHostKeyChecking no
