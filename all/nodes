@@ -1,3 +1,3 @@
-| 3d3bad38-4229-4e79-b0a3-bec2b30e993e | tag-node3   | ACTIVE | tag-network=10.0.1.22                  | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
-| a0e8199e-0ba7-400e-9ffb-1c0573733e9a | tag-node2   | ACTIVE | tag-network=10.0.1.20                  | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
-| a775301c-91e3-4571-a5fa-fc50d658d82b | tag-node1   | ACTIVE | tag-network=10.0.1.43                  | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+| 4471b730-3de8-439f-8ebc-b7fdbb6ab67b | tag-node3   | ACTIVE | tag-network=10.0.1.11                 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+| 5c4332a3-e7c1-42a0-8c15-b68bf6823e88 | tag-node2   | ACTIVE | tag-network=10.0.1.31                 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |
+| b3683e91-f304-4254-9b82-9ebc85fc74fd | tag-node1   | ACTIVE | tag-network=10.0.1.48                 | Ubuntu 22.04.1 Jammy Jellyfish 230124 | 1C-1GB-20GB |

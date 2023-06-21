@@ -51,38 +51,3 @@ Host *
     SendEnv LANG LC_*
     HashKnownHosts yes
     GSSAPIAuthentication yes
-Host bastion
-  HostName 91.106.199.217
-  User ubuntu
-  IdentityFile ./all/privatekey
-  StrictHostKeyChecking no
-Host 10.0.1.50
-  HostName 10.0.1.50
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/privatekey
-  StrictHostKeyChecking no
-Host 10.0.1.37
-  HostName 10.0.1.37
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/privatekey
-  StrictHostKeyChecking no
-Host 10.0.1.48
-  HostName 10.0.1.48
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/privatekey
-  StrictHostKeyChecking no
-Host 10.0.1.31                 
-  HostName 10.0.1.31                 
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/privatekey
-  StrictHostKeyChecking no
-Host 10.0.1.11                 
-  HostName 10.0.1.11                 
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/privatekey
-  StrictHostKeyChecking no
