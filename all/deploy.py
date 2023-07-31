@@ -33,6 +33,7 @@ private_key_file = "./all/" + sys.argv[2]
 if key_name not in keyp:
     try:
         keypair = conn.compute.create_keypair(name=key_name)
+        keypair = conn.compute.create_keypair(name=key_name, public_key=sys.argv[2])
         with open(private_key_file, "w") as f:
             f.write(keypair.private_key)
         os.chmod(private_key_file, 0o600)
