@@ -14,8 +14,8 @@ bastion = 'bastion'
 security_group = 'security'
 node = 'node'
 fl = '1C-1GB-20GB'
-img = "Ubuntu 22.04.1 Jammy Jellyfish 230124"
-
+output = subprocess.check_output('openstack image list | grep "Ubuntu" | cut -d "|" -f 3 | tail -n 2 | head -n 1', shell=True)
+img = output.decode('utf-8').strip()
 
 GROUP_HAPROXY = "[Proxy]"
 GROUP_WEBSERVERS = "[webservers]"
@@ -28,15 +28,16 @@ conn = openstack.connect()
 
 keyp = [keypair.name for keypair in conn.compute.keypairs()]
 key_name = sys.argv[1] + "-" + key
-private_key_file = "./all/" + sys.argv[2]
-
+pub_key_file = sys.argv[2]
+private_key_file= sys.argv[2].rsplit('.', 1)[0]
+cmm ="openstack keypair create --public-key {} {}".format(pub_key_file, key_name)
 if key_name not in keyp:
     try:
-        keypair = conn.compute.create_keypair(name=key_name)
-        keypair = conn.compute.create_keypair(name=key_name, public_key=sys.argv[2])
-        with open(private_key_file, "w") as f:
-            f.write(keypair.private_key)
-        os.chmod(private_key_file, 0o600)
+        #keypair = conn.compute.create_keypair(name=key_name)
+       os.system(cmm)
+       # with open(private_key_file, "w") as f:
+        #    f.write(keypair.private_key)
+        #os.chmod(private_key_file, 0o600)
     except openstack.exceptions.SDKException as e:
         print("Failed to create key pair:", str(e))
 else:
@@ -215,6 +216,7 @@ with open("./all/hosts", 'a+') as f:
     bss = f"{bastion} ansible_host={bastion_ip}"
     f.write(f"{BASTION_HOST}\n{bss}\n")
     f.write("\n")
+    os.remove("./all/ssh_config")
     with open("./all/ssh_config", 'a+') as s:
         s.write(f"{'Host bastion'}\n{'  HostName '}{bastion_ip}\n{'  User ubuntu'}\n{'  IdentityFile '}{private_key_file}\n{'  StrictHostKeyChecking no'}\n")
 # Add HAproxy server to hosts file

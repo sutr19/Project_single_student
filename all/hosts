@@ -1,23 +1,22 @@
 [Bastion]
-serv1-bastion ansible_host=91.106.199.205
+p-bastion ansible_host=188.95.226.20
 
 [Public]
-tag-proxy3 public_ip=188.95.227.199
+tag-proxy3 public_ip=188.95.226.33
 
 [Proxy]
-serv1-proxy1 ansible_host=10.0.1.25
-serv1-proxy2 ansible_host=10.0.1.54
+p-proxy1 ansible_host=10.0.1.55
+p-proxy2 ansible_host=10.0.1.29
 
 [Proxy1]
-serv1-proxy1 ansible_host=10.0.1.25
+p-proxy1 ansible_host=10.0.1.55
 
 [Proxy2]
-serv1-proxy2 ansible_host=10.0.1.54
+p-proxy2 ansible_host=10.0.1.29
 
 [webservers]
-serv1-node1 ansible_host=10.0.1.15
-serv1-node2 ansible_host=10.0.1.6                  
-serv1-node3 ansible_host=10.0.1.14                 
+p-node1 ansible_host=10.0.1.4                 
+p-node5 ansible_host=10.0.1.59                
 
 [all:vars]
 ansible_user=ubuntu

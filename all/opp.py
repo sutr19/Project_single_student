@@ -10,13 +10,15 @@ node_name = sys.argv[1]+"-"+'node'
 fl = '1C-1GB-20GB'
 key = sys.argv[1]+"-"+'key'
 net = sys.argv[1]+"-"+'network'
-secgroup = sys.argv[1]+"-"+'securityg'
-img = 'Ubuntu 22.04.1 Jammy Jellyfish 230124'
+secgroup = sys.argv[1]+"-"+'security'
+output = subprocess.check_output('openstack image list | grep "Ubuntu" | cut -d "|" -f 3 | tail -n 2 | head -n 1', shell=True)
+img = output.decode('utf-8').strip()
 image = conn.compute.find_image(img)
 flavor = conn.compute.find_flavor(fl)
 loop = 0
 exist_node = 0
-private_key_file = "./all/" + sys.argv[2]
+#pub_key_file = sys.argv[2]
+private_key_file = sys.argv[2].rsplit('.', 1)[0]
 
 with open("./all/servers.conf") as f:
     required_node = int(f.read())

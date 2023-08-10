@@ -60,14 +60,3 @@ security_group=argv[2]+"-"+security_group
 os.system("openstack security group delete {}".format(security_group))
 
 
-#deleting ssh_config
-def remove_lines(filename):
-    with open(filename, 'r') as file:
-        lines = file.readlines()
-
-    with open(filename, 'w') as file:
-        file.writelines(lines[:53])  
-
-filename = './all/ssh_config'  
-remove_lines(filename)
-print("Cleaning completed!\n")
