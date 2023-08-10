@@ -1,57 +1,49 @@
 Host bastion
-  HostName 188.95.226.20
+  HostName 89.46.83.92
   User ubuntu
   IdentityFile ./all/sshkey
   StrictHostKeyChecking no
-Host 10.0.1.55
-  HostName 10.0.1.55
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/sshkey
-  StrictHostKeyChecking no
-Host 10.0.1.29
-  HostName 10.0.1.29
+Host 10.0.1.10
+  HostName 10.0.1.10
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/sshkey
   StrictHostKeyChecking no
-Host 10.0.1.26
-  HostName 10.0.1.26
+Host 10.0.1.60
+  HostName 10.0.1.60
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/sshkey
   StrictHostKeyChecking no
-Host 10.0.1.19                
-  HostName 10.0.1.19                
+Host 10.0.1.50
+  HostName 10.0.1.50
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/sshkey
+  StrictHostKeyChecking no
+Host 10.0.1.39                
+  HostName 10.0.1.39                
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/sshkey
+  StrictHostKeyChecking no
+Host 10.0.1.15                
+  HostName 10.0.1.15                
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./all/sshkey
+  StrictHostKeyChecking no
+Host 10.0.1.33                
+
+  HostName 10.0.1.33                
+
   User ubuntu
   ProxyJump bastion
   IdentityFile ./all/sshkey
   StrictHostKeyChecking no
 Host 10.0.1.7                 
+
   HostName 10.0.1.7                 
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/sshkey
-  StrictHostKeyChecking no
-Host 10.0.1.53                
-
-  HostName 10.0.1.53                
-
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/sshkey
-  StrictHostKeyChecking no
-Host 10.0.1.59                
-
-  HostName 10.0.1.59                
-
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./all/sshkey
-  StrictHostKeyChecking no
-Host 10.0.1.4                 
-
-  HostName 10.0.1.4                 
 
   User ubuntu
   ProxyJump bastion

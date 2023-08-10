@@ -33,11 +33,7 @@ private_key_file= sys.argv[2].rsplit('.', 1)[0]
 cmm ="openstack keypair create --public-key {} {}".format(pub_key_file, key_name)
 if key_name not in keyp:
     try:
-        #keypair = conn.compute.create_keypair(name=key_name)
        os.system(cmm)
-       # with open(private_key_file, "w") as f:
-        #    f.write(keypair.private_key)
-        #os.chmod(private_key_file, 0o600)
     except openstack.exceptions.SDKException as e:
         print("Failed to create key pair:", str(e))
 else:

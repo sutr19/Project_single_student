@@ -1,1 +1,2 @@
-| d516e6bc-b678-49bd-bf04-e62083d3a722 | p-node5   | ACTIVE | p-network=10.0.1.59                | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| 4c64c2bd-b264-4812-b81f-d98b471d9374 | ser-node5   | ACTIVE | ser-network=10.0.1.7                 | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| a92452d3-14c6-4758-ab7a-deb191b231af | ser-node4   | ACTIVE | ser-network=10.0.1.33                | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
