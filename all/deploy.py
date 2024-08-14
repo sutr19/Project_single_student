@@ -26,6 +26,7 @@ node_ips = []
 print("Deploying Network Please wait patiently!\n")
 conn = openstack.connect()
 
+
 keyp = [keypair.name for keypair in conn.compute.keypairs()]
 key_name = sys.argv[1] + "-" + key
 pub_key_file = sys.argv[2]

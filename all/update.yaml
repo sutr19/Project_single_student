@@ -71,5 +71,4 @@
   - name: "Install keepalived package"
     package:
       name: keepalived
-      state: present 
-  
+      state: present   

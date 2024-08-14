@@ -51,7 +51,6 @@ for port in ports:
             break
     conn.network.update_port(port)
 os.system("openstack subnet  delete {}".format(subnet1))
-
 # delete network
 net=argv[2]+"-"+net
 os.system("openstack network delete {}".format(net))
