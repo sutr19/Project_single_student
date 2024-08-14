@@ -1,14 +1,3 @@
-# Network deployment and service operation in openstack with ansible 
-# this project consists of among others three main files 
-1. install.sh: this deploys all required resources and services 
-2. operate.sh: manage the number of nodes 
-3. cleanup.sh: clear all deployed resources 
+Project_Single_Student:
 
-The folder named all containes suporting files
-
-proxy server listning ports:
- 80 for http
- 53 for SNMP
-working nodes listening ports
-5000 for http
-6000 for snmp
+Functional Approach.
