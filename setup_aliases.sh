@@ -3,7 +3,7 @@
 # Define the paths
 BASH_ALIASES="$HOME/.bash_aliases"
 BASHRC="$HOME/.bashrc"
-SCRIPT_DIR="/home/roopsai/Desktop/deploy_and_operate_service"
+SCRIPT_DIR="/home/roopsai/Desktop/Project_single_student"
 
 # Create or overwrite the .bash_aliases file with the necessary aliases
 echo "Creating or updating $BASH_ALIASES"
