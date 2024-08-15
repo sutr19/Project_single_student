@@ -1,2 +1,5 @@
-| 4c64c2bd-b264-4812-b81f-d98b471d9374 | ser-node5   | ACTIVE | ser-network=10.0.1.7                 | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
-| a92452d3-14c6-4758-ab7a-deb191b231af | ser-node4   | ACTIVE | ser-network=10.0.1.33                | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| 4e0da298-4621-40fd-9758-43fc8df357a2 | mut-node5   | ACTIVE | mut-network=10.0.1.47                 | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| d062d5c2-fd92-4e34-8ce4-ad6acb337762 | mut-node4   | ACTIVE | mut-network=10.0.1.8                  | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| 450bea8a-c336-44ce-a10c-99b4bca6a3f1 | mut-node2   | ACTIVE | mut-network=10.0.1.7                  | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| fcefcbec-7cd5-4891-bc6d-9958658e5575 | mut-node1   | ACTIVE | mut-network=10.0.1.20                 | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
+| a687103c-3fc7-4ceb-8b89-224bc3a22cd7 | mut-node3   | ACTIVE | mut-network=10.0.1.37                 | Ubuntu 22.04 Jammy Jellyfish x86_64 | 1C-1GB-20GB |
