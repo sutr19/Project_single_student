@@ -1,10 +1,13 @@
+#!/usr/bin/env python3
+
 import os
 import openstack
 import subprocess
 import sys
 import json
-from subprocess import run, CalledProcessError
-
+from subprocess import run
+from collections import OrderedDict
+from pprint import pprint
 class OpenStackManager:
 
     def __init__(self, conn, existing_attr, existing_nodes):
@@ -13,220 +16,181 @@ class OpenStackManager:
         self.nodes = existing_nodes
 
     def create_keypair(self, key_name: str):
-        """
-        Generates a 4096-bit RSA key pair without a passphrase and stores them in ~/.ssh/key_name
-        """
-        key_path = os.path.join("./all", key_name)
-        command = f"ssh-keygen -t rsa -b 4096 -f {key_path} -N "" > {key_path}.pub"
-
+        pub_key_file = sys.argv[2] + '.pub'
+        pub_key_path = os.path.join(os.getcwd(), pub_key_file)
+        if not os.path.isfile(pub_key_path):
+            print(f"Error: Public key file {pub_key_path} does not exist.")
+            return
+        openstack_command = f"openstack keypair create --public-key {pub_key_path} {key_name}"
         try:
-            run(command, shell=True, check=True)
-            print(f"Key pair created: {key_name}")
-            
-            # Optionally, extract the public key content for use with OpenStack
-            with open(f"{key_path}.pub", "r") as f:
-                public_key = f.read().strip()
-            
-            # Call OpenStack keypair create with the extracted public_key
-            openstack_command = f"openstack keypair create --public-key {public_key} {key_name}"
-            run(openstack_command, shell=True, check=True)
+            subprocess.run(openstack_command, shell=True, check=True)
             print(f"OpenStack key pair created: {key_name}")
-            
-        except CalledProcessError as e:
-            print(f"An error occurred while creating key pair: {e}")
-
+        except subprocess.CalledProcessError as e:
+            print(f"Error creating key pair: {e}")
+    
     def create_network(self, network_name: str):
-        try:
-            newnet = self.conn.network.create_network(name=network_name)
-            print(f"Network created: {newnet.name}")
-            self.update_file('networks', newnet.name)
-        except Exception as e:
-            print(f"An error occurred while creating network: {e}")
-
-
-    def create_subnet(self, subnet_name: str, network_name: str):
-        try:
-            newnet = self.conn.network.find_network(network_name)
-            if newnet:
-                new_subnet = self.conn.network.create_subnet(
-                    network_id=newnet.id, name=subnet_name, cidr="10.0.1.0/26", ip_version=4
-                )
-                print(f"Subnet created: {new_subnet.name}")
-                self.update_file('subnets', new_subnet.name)
-            else:
-                print(f"Network {network_name} not found")
-        except Exception as e:
-            print(f"An error occurred while creating subnet: {e}")
-
+        newnet = self.conn.network.create_network(name=network_name)
+        print(f"Network created: {newnet.name}")
+        subnet_name = tag + 'subnet'
+        new_subnet = self.conn.network.create_subnet(
+            network_id=newnet.id, name=subnet_name, cidr="10.0.1.0/26", ip_version=4
+        )
+        print(f"Subnet created: {new_subnet.name}")
+        
     def create_router(self, router_name: str):
-        try:
-            existing_routers = [rt.name for rt in self.conn.network.routers()]
-            if router_name not in existing_routers:
+        new_router = self.conn.network.create_router(name=router_name)
+        print(f"Router created: {new_router.name}")
+        subnet_name = tag +'subnet'
+        if subnet_name:
+            new_subnet = self.conn.network.find_subnet(subnet_name)
+            if new_subnet:
+                self.conn.network.add_interface_to_router(new_router.id, subnet_id=new_subnet.id)
+
+        external_network = self.conn.network.find_network("ext-net")
+        if external_network:
+            self.conn.network.update_router(new_router, external_gateway_info={"network_id": external_network.id})
+        else:
+            print("External network not found")
 
 
-                new_router = self.conn.network.create_router(name=router_name)
-                print(f"Router created: {new_router.name}")
-                self.update_file('routers', new_router.name)
-
-                subnet_name = self.attr.get('subnet')
-                if subnet_name:
-                    new_subnet = self.conn.network.find_subnet(subnet_name)
-                    if new_subnet:
-                        self.conn.network.add_interface_to_router(new_router.id, subnet_id=new_subnet.id)
-
-                external_network = self.conn.network.find_network("ext-net")
-                if external_network:
-                    self.conn.network.update_router(new_router.id, external_gateway_info={"network_id": external_network.id})
-                else:
-                    print("External network not found")
-            else:
-                print(f"Router {router_name} already exists")
-        except Exception as e:
-            print(f"An error occurred while creating router: {e}")
     def create_security_group(self, security_group_name: str):
-        try:
-            new_security = self.conn.network.create_security_group(name=security_group_name)
-            rules = [
-                {'port_range_min': 22, 'port_range_max': 22},
-                {'port_range_min': 80, 'port_range_max': 80},
-                {'port_range_min': 53, 'port_range_max': 53},
-                {'port_range_min': 5000, 'port_range_max': 5000},
-                {'port_range_min': 6000, 'port_range_max': 6000}
-            ]
-            for rule in rules:
-                self.conn.network.create_security_group_rule(
-                    security_group_id=new_security.id,
-                    direction='ingress',
-                    ethertype='IPv4',
-                    protocol='tcp',
-                    **rule
-                )
-            self.conn.network.create_security_group_rule(
+   
+        new_security = self.conn.network.create_security_group(name=security_group_name)
+    
+        conn.network.create_security_group_rule(
+            security_group_id=new_security.id,
+            direction='ingress',
+            ethertype='IPv4',
+            protocol='tcp',
+            port_range_min=22,
+            port_range_max=22
+        )
+
+        conn.network.create_security_group_rule(
+            security_group_id=new_security.id,
+            direction='ingress',
+            ethertype='IPv4',
+            protocol='tcp',
+            port_range_min=80,
+            port_range_max=80
+        )
+
+        for port in [53, 5000, 6000]:
+            conn.network.create_security_group_rule(
                 security_group_id=new_security.id,
                 direction='ingress',
                 ethertype='IPv4',
-                protocol='icmp'
+                protocol='tcp',
+                port_range_min=port,
+                port_range_max=port
             )
-            print(f"Security group created: {new_security.name}")
-            self.update_file('security_groups', new_security.name)
-        except Exception as e:
-            print(f"An error occurred while creating security group: {e}")
 
-    def create_floating_ip(self, floating_ip:str):
-        command = "openstack floating ip create ext-net -f json"
-        try:
-            output = subprocess.check_output(command, shell=True).decode('utf-8')
-            floating_ip = json.loads(output)['floating_ip_address']
-            print(f"Floating IP created: {floating_ip}")
-            return floating_ip
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred while creating floating IP: {e}")
-            return None
-
-    def add_floating_ip_to_server(self, server_id: str, floating_ip: str):
-        if server_id and floating_ip:
-            command = f"openstack server add floating ip {server_id} {floating_ip}"
-            try:
-                subprocess.check_output(command, shell=True)
-                print(f"Floating IP {floating_ip} added to server {server_id}")
-            except subprocess.CalledProcessError as e:
-                print(f"An error occurred while adding floating IP to server: {e}")
-
-    def add_security_group(self, server_id: str, security_group: str):
-        if server_id and security_group:
-            command = f"openstack server add security group {server_id} {security_group}"
-            try:
-                subprocess.check_output(command, shell=True)
-                print(f"Security group {security_group} added to server                          {server_id}")
-            except subprocess.CalledProcessError as e:
-                print(f"An error occurred while adding security group to server: {e}")
-    
+        conn.network.create_security_group_rule(
+            security_group_id=new_security.id,
+            direction='ingress',
+            ethertype='IPv4',
+            protocol='icmp'
+        )
+        print(f"Security group created: {new_security.name}")
+         
 
     def create_server(self, server_name: str):
+        pprint(self.nodes)  
 
-        try:
-        # Use provided arguments or fallback to values from self.attr
-            image_id =self.attr.get('image')
-            flavor_id =self.attr.get('flavor')
-            key_name = self.attr.get('key_name')
-            network_id = self.attr.get('networks')
+        image = self.attr.get('image')
+        flavor1 =self.attr.get('flavor')
+        keypair = self.attr.get('keypair')
+        network1 = self.attr.get('network')
+        network2= network1[0]
 
-            if not all([image_id, flavor_id, key_name, network_id]):
-                raise ValueError("Missing required arguments: image_id, flavor_id, key_name, network_id")
+        image = conn.compute.find_image(image)
+        flavor = conn.compute.find_flavor(flavor1)
+        network = conn.network.find_network(network2)
+        key_name=keypair[0]
 
-            server = self.conn.compute.create_server(
+        if not image or not flavor or not keypair or not network:
+            raise ValueError("Missing required attributes in existing_attr")
+
+        server = self.conn.compute.create_server(
                 name=server_name,
-                image_id=image_id,
-                flavor_id=flavor_id,
-                key_name=key_name,
-                networks=[{"uuid": network_id}]
+                image_id=image.id,
+                flavor_id=flavor.id,
+                key_name=key_name,  # Assuming keypair is a list with one element
+                networks=[{"uuid": network.id}]
             )
-            print(f"Server created: {server_name}")
-            floating_ip = self.attr.get('floating_ip', None)
-            if server_name == tag + 'bastion' or server_name.startswith(tag + 'proxy'):
-                if floating_ip:
-                    print(f"Using existing floating IP: {floating_ip}")
-                    self.add_floating_ip_to_server(server.id, floating_ip)
+        
+        print(f"Server created: {server_name}")
+        security1 = self.attr.get('security_group')
+        security = security1[0]
+        security_group = conn.network.find_security_group(security)  # Find by name
+        if security_group:
+            command = f"openstack server add security group {server.id} {security_group.id}"
+            try:
+                subprocess.check_output(command, shell = True)
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to add security group: {e.output.decode('utf-8')}")  # Print error message
 
-                else:
-                    command = "openstack floating ip create ext-net -f json"
-                    try:
-                        output = subprocess.run(command, capture_output=True, text=True).stdout
-                        new_floating_ip = json.loads(output)['floating_ip_address']
-                        print(f"Floating IP created: {new_floating_ip}")
-                        self.add_floating_ip_to_server(server.id, new_floating_ip)
-                    # Update existing_attr with the new floating IP (optional)
-                        self.attr['floating_ip'] = new_floating_ip
-                    except subprocess.CalledProcessError as e:
-                        print(f"An error occurred while creating floating IP: {e}")
+        floating_ip = subprocess.run(
+            ["openstack", "floating", "ip", "list", "--status", "DOWN", "-f", "value", "-c", "Floating IP Address"],
+        capture_output=True, check=True).stdout.decode('utf-8').strip().splitlines()
+
+        if server_name == tag + 'bastion' or server_name.startswith(tag + 'proxy'):
+            if floating_ip:
+                floating_ip_addr = floating_ip[0]
+
+                print(f"Using existing floating IP: {floating_ip_addr}")
+                command = "openstack server add floating ip {} {}".format(
+                    server.id, floating_ip_addr)
+                subprocess.check_output(command, shell=True)
+                
+            else:
+                print("No down floating IP addresses found")
+                command1 = "openstack floating ip create ext-net -f json"
+                output = subprocess.check_output(command1, shell=True).decode('utf-8')
+                floating_ip1 = json.loads(output)['floating_ip_address']
+                print(f"Floating IP created: {floating_ip1}")
+
+                command = "openstack server add floating ip {} {}".format(
+                    server.id, floating_ip1)
+                subprocess.check_output(command, shell=True)
+                
             return server            
-        except Exception as e:
-            return f"Error creating server {server_name}: {e}"           
-
-    def update_file(self, resource_type: str, resource_name: str):
-        # Placeholder for updating a file with the resource information
-        print(f"Updating {resource_type} file with: {resource_name}")
-
+   #         return f"Error creating server {server_name}: {e}"           
 
 conn = openstack.connect()
 
-#
-#existing_attr = {
-#    'keypairs': [keypair.name for keypair in conn.compute.keypairs()],
-#    'network': [netw.name for netw in conn.network.find_network()],
-#    'router': [rt.name for rt in conn.network.routers()],
-#    'security_group': [sg.name for sg in conn.network.security_groups()],
-#    'images': [conn.compute.find_image(attr['image'])],
-#    'flavor' : [ conn.compute.find_flavor(attr['flavor'])]
-#    }
+tag = sys.argv[1]+'-'
 
-tag = 'mut' + '-'
-#tag = sys.argv[1] + '-'
-
-image = subprocess.check_output(
+# Retrieve the image ID
+image_id = subprocess.check_output(
     'openstack image list | grep "Ubuntu" | awk \'{print $2}\' | head -n 1',
     shell=True
 ).decode('utf-8').strip()
 
-existing_attr = {
-    'key': [keypair.name for keypair in conn.compute.keypairs() if keypair.name == tag + 'key'],
-    'network': [netw.name for netw in conn.network.networks() if netw.name == tag + 'network'],
-    'router': [rt.name for rt in conn.network.routers() if rt.name == tag + 'router'],
-    'security_group': [sg.name for sg in conn.network.security_groups() if sg.name == tag + 'security_group'],
-    'image': conn.compute.find_image(image),  # Direct image object
-    'flavor': conn.compute.find_flavor('1C-1GB-20GB'),  # Direct flavor object
-    'floating_ip' : []
-}
+# Fetch the image and flavor objects
+image_obj = conn.compute.find_image(image_id)
+flavor_obj = conn.compute.find_flavor('1C-1GB-20GB')
+
+existing_attr = OrderedDict([
+    ('keypair', [keypair.name for keypair in conn.compute.keypairs() if keypair.name == tag + 'keypair']),
+    ('network', [netw.name for netw in conn.network.networks() if netw.name == tag + 'network']),
+    ('router', [rt.name for rt in conn.network.routers() if rt.name == tag + 'router']),
+    ('security_group', [sg.name for sg in conn.network.security_groups() if sg.name == tag + 'security_group']), 
+    ('image', image_obj.name if image_obj else 'Image not found'),
+    ('flavor', flavor_obj.name if flavor_obj else 'Flavor not found')
+    ])
+
 
 servers = conn.compute.servers()
-existing_nodes = {
-    'proxy': [server.name for server in servers if server.name.startswith(tag + 'proxy')],
-    'bastion': [server.name for server in servers if server.name.startswith(tag + 'bastion')],
-    'node': [server.name for server in servers if server.name.startswith(tag + 'node')]
-}
+existing_nodes = OrderedDict([
+    ('bastion', [server.name for server in servers if server.name.startswith(tag + 'bastion')]),
+    ('proxy', [server.name for server in servers if server.name.startswith(tag + 'proxy')]),
+    ('node', [server.name for server in servers if server.name.startswith(tag + 'node')])
+])
+
 
 def process_items(existing_items):
-    should_create = {}
+    should_create = OrderedDict()
 
     for key, value in existing_items.items():
         if not value:  # Check if the value is an empty list
@@ -234,134 +198,233 @@ def process_items(existing_items):
 
     return should_create
 
-combined_should_create = {
-    'should_create_attr': process_items(existing_attr),
-    'should_create_nodes': process_items(existing_nodes)
+def process_items1(existing_items, item_counts):
+    should_create = OrderedDict()
+
+    for key, value in existing_items.items():
+        if not value:
+            count = item_counts.get(key, 1)  # Default to 1 if key not found
+            should_create[key] = [f"{tag}{key}"] if count == 1 else [f"{tag}{key}_{i}" for i in range(1, count + 1)]
+
+    return should_create
+
+item_counts = {
+    'proxy': 2,
+    'bastion': 1,
+    'node': 3
 }
 
+combined_should_create = OrderedDict([
+    ('should_create_attr', process_items(existing_attr)),
+    ('should_create_nodes', process_items1(existing_nodes, item_counts))
+])
+pprint(existing_attr)
+pprint(existing_nodes)
+print(combined_should_create)
+
+
+
+image = existing_attr.get('image')
 
 manager = OpenStackManager(conn, existing_attr, existing_nodes)
 
-for resource_type, resources_name in combined_should_create.items():
-    for attr_type,  attr_name in resources_name.items():
-        method_name = f"create_{attr_type}"
+# Create attributes
+for attr_type, attr_name in combined_should_create['should_create_attr'].items():
+    method_name = f"create_{attr_type}"
+    print(f"Creating {method_name}")
+    method = getattr(manager, method_name, None)
+
+    if callable(method):
+        created_value = method(attr_name)
+        if created_value:
+            print(f" {created_value} created")
+
+        if isinstance(existing_attr[attr_type], list):
+            existing_attr[attr_type].append(attr_name)
+            print(f"Attribute {attr_type} - {attr_name} created and added to existing_attr")
+    else:
+        print(f"Method for creating {attr_type} not found")
+
+pprint(existing_attr)  
+
+#create nodes
+for attr_type, attr_names in combined_should_create['should_create_nodes'].items():
+    for attr_name in attr_names:
+        method_name = f"create_server"
+        print(f"Creating {attr_name}")
         method = getattr(manager, method_name, None)
 
         if callable(method):
             created_value = method(attr_name)
             if created_value:
-                if resource_type.endswith('attr'):
-                    existing_attr.setdefault(attr_type, []).append(created_value)
-                elif resource_type.endswith('nodes'):
-                    existing_nodes.setdefault(attr_type, []).append(created_value)
-                    print("Resource " + attr_type + " - " + str(created_value) + " created")
-
+                print(f" {created_value} created")
+            if attr_name in existing_nodes:
+                if isinstance(existing_nodes[attr_type], list):
+                    existing_nodes.setdefault(attr_type, []).append(attr_name)
+                    print(f"Attribute {attr_type} - {attr_name} created and added to existing_nodes")
+            else:
+            # Add the server name even if the key doesn't exist yet
+                existing_nodes.setdefault(attr_type, []).append(attr_name)
+                print(f"Attribute {attr_type} - {attr_name} created and added to existing_nodes")
         else:
-            print("Method for " + resource_type + " not found")
+            print(f"Method for creating {attr_type} not found")
+pprint(existing_nodes)
 
 
 def get_server_info(server_name):
     """Retrieves hostname, public IP, and private IP for a given server."""
-    command = f"openstack server show {server_name} --format json"
-    output = subprocess.check_output(command, shell=True, text=True)
-    server_data = json.loads(output)
 
-    hostname = server_data['name']
-    public_ip = server_data['addresses']['ext-net'][0]['addr']
-    private_ip = server_data['addresses']['private'][0]['addr']
+    try:
+        # Get server details using openstack server show
+        command = f"openstack server show {server_name} --format json"
+        output = subprocess.check_output(command, shell=True, text=True)
+        server_data = json.loads(output)
+        hostname = server_data['name']
 
-    return {
-        'hostname': hostname,
-        'public_ip': public_ip,
-        'private_ip': private_ip
-    }
+        # Extract public and private IPs using the provided logic
+        command1 = f"openstack server list | grep {server_name} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2"
+        public_ip = subprocess.check_output(command1, shell=True, text=True).strip()
+        command2 = f"openstack server list | grep {server_name} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1"
+        private_ip = subprocess.check_output(command2, shell=True, text=True).strip()
 
-def create_ansible_inventory(bastion_host, proxy_prefix, node_prefix, private_key_file, inventory_dir="./all"):
-    """Creates an Ansible inventory and SSH config based on a dictionary of nodes."""
-
-    # Get server information for bastion, HAproxy, and web servers
-    bastion_info = get_server_info(bastion_host)
-    haproxy_servers = [f"{proxy_prefix}{i}" for i in range(1, 3)]  # Adjust number of HAproxy servers as needed
-    haproxy_info = {server: get_server_info(server) for server in haproxy_servers}
-    node_servers = [f"{node_prefix}{i}" for i in range(1, 5)]  # Adjust number of web servers as needed
-    node_info = {server: get_server_info(server) for server in node_servers}
-
-    # Combine server information into a single dictionary
-    nodes_info = {
-        bastion_host: bastion_info,
-        **haproxy_info,
-        **node_info
-    }
+        return {'hostname': hostname, 'public_ip': public_ip, 'private_ip': private_ip}
+    except (subprocess.CalledProcessError, KeyError, IndexError, json.JSONDecodeError) as e:
+        print(f"Error retrieving server info for {server_name}: {e}")
+        return None
+    
 
 def get_server_info(server_name):
     """Retrieves hostname, public IP, and private IP for a given server."""
-    command = f"openstack server show {server_name} --format json"
-    output = subprocess.check_output(command, shell=True, text=True)
-    server_data = json.loads(output)
 
-    hostname = server_data['name']
-    public_ip = server_data['addresses']['ext-net'][0]['addr']
-    private_ip = server_data['addresses']['private'][0]['addr']
+    try:
+        # Get server details using openstack server show
+        command = f"openstack server show {server_name} --format json"
+        output = subprocess.check_output(command, shell=True, text=True)
+        server_data = json.loads(output)
+        hostname = server_data['name']
 
-    return {
-        'hostname': hostname,
-        'public_ip': public_ip,
-        'private_ip': private_ip
-    }
+        # Extract public and private IPs using the provided logic
+        command1 = f"openstack server list | grep {server_name} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f2"
+        public_ip = subprocess.check_output(command1, shell=True, text=True).strip()
+        command2 = f"openstack server list | grep {server_name} | cut -d'|' -f5 | cut -d'=' -f2 | cut -d',' -f1"
+        private_ip = subprocess.check_output(command2, shell=True, text=True).strip()
 
+        return {'hostname': hostname, 'public_ip': public_ip, 'private_ip': private_ip}
+    except (subprocess.CalledProcessError, KeyError, IndexError, json.JSONDecodeError) as e:
+        print(f"Error retrieving server info for {server_name}: {e}")
+        return None
 
 def create_ansible_inventory(existing_nodes, private_key_file, inventory_dir="./all"):
-    """Creates an Ansible inventory and SSH config based on the provided nodes dictionary."""
-
-    # Transform existing_nodes to desired structure
-    transformed_nodes = {}
-    for node_type, nodes in existing_nodes.items():
-        transformed_nodes[node_type] = [
-            get_server_info(node) for node in nodes
-        ]
-
-    # Create inventory file
     inventory_file = os.path.join(inventory_dir, "hosts")
+    
+    if os.path.exists(inventory_dir) and not os.path.isdir(inventory_dir):
+        raise ValueError(f"'{inventory_dir}' exists and is not a directory.")
+    
     os.makedirs(inventory_dir, exist_ok=True)
+    transformed_nodes = {}
 
     with open(inventory_file, "w") as f:
-        for node_type, nodes in transformed_nodes.items():
-            f.write(f"[{node_type}]\n")
-            for node in nodes:
-                hostname = node['hostname']
-                if node['public_ip']:
-                    f.write(f"{hostname} ansible_host={node['public_ip']}\n")
-                else:
+        for group_name, node_names in existing_nodes.items():
+            f.write(f"[{group_name}]\n")
+            transformed_nodes[group_name] = []
+            for node_name in node_names:
+                node_info = get_server_info(node_name)
+                if node_info:
+                    transformed_nodes[group_name].append(node_info)
+                    hostname = node_info['hostname']
+                    if group_name == 'Public':
+                        f.write(f"{hostname} public_ip={node_info['public_ip']}\n")
+                    else:
+                        f.write(f"{hostname} ansible_host={node_info['private_ip'] if not node_info['public_ip'] else node_info['public_ip']}\n")
+            f.write("\n")
+
+        # Add specific proxy groups
+        if 'proxy' in transformed_nodes:
+            proxy_nodes = transformed_nodes['proxy']
+            f.write("[proxy1]\n")
+            for node in proxy_nodes:
+                if node['hostname'].endswith("_1"):
+                    hostname = node['hostname']
                     f.write(f"{hostname} ansible_host={node['private_ip']}\n")
+            f.write("\n")
+
+            f.write("[proxy2]\n")
+            for node in proxy_nodes:
+                if node['hostname'].endswith("_2"):
+                    hostname = node['hostname']
+                    f.write(f"{hostname} ansible_host={node['private_ip']}\n")
+            f.write("\n")
+
+            f.write("[proxyprivate]\n")
+            for node in proxy_nodes:
+                hostname = node['hostname']
+                f.write(f"{hostname} ansible_host={node['private_ip']}\n")
             f.write("\n")
 
         f.write("[all:vars]\n")
         f.write("ansible_user=ubuntu\n")
+
     # Create SSH config file
-      # Create SSH config file
     ssh_config_file = os.path.join(inventory_dir, "ssh_config")
 
     with open(ssh_config_file, "w") as s:
-        # Assuming the first node in 'bastion' is the bastion host
-        bastion_info = transformed_nodes['bastion'][0]
-        s.write(f"Host bastion\n")
-        s.write(f"  HostName {bastion_info['public_ip']}\n")
-        s.write(f"  User ubuntu\n")
-        s.write(f"  IdentityFile {private_key_file}\n")
-        s.write(f"  StrictHostKeyChecking no\n\n")
+        # Check if 'bastion' key exists in transformed_nodes
+        if 'bastion' in transformed_nodes and transformed_nodes['bastion']:
+            bastion_info = transformed_nodes['bastion'][0]
+            s.write(f"Host bastion\n")
+            s.write(f"  HostName {bastion_info['public_ip']}\n")
+            s.write(f"  User ubuntu\n")
+            s.write(f"  IdentityFile ./{private_key_file}\n")
+            s.write(f"  StrictHostKeyChecking no\n\n")
 
         for node_type, nodes in transformed_nodes.items():
             if node_type != 'bastion':
                 for node in nodes:
                     s.write(f"Host {node['private_ip']}\n")
-                    s.write(f"  HostName {node['private_ip']}\n")
+                    s.write(f"HostName {node['private_ip']}\n")
                     s.write(f"  User ubuntu\n")
                     s.write(f"  ProxyJump bastion\n")
-                    s.write(f"  IdentityFile {private_key_file}\n")
+                    s.write(f"  IdentityFile ./{private_key_file}\n")
                     s.write(f"  StrictHostKeyChecking no\n\n")
 
 
+def get_bastion_ip(bastion_name):
+    command = f"openstack server show -f value -c addresses {bastion_name}"
+    try:
+        bastion_ip = subprocess.check_output(command, shell=True).decode('utf-8').strip()
+        bastion_ip = bastion_ip.split('=')[-1]
+        return bastion_ip
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to retrieve IP address for {bastion_name}. Error: {e}")
+        sys.exit(1)
+
+def remove_old_host_key(ip_address):
+    command = f"ssh-keygen -f ~/.ssh/known_hosts -R {ip_address}"
+    try:
+        subprocess.run(command, shell=True, check=True)
+        print(f"Removed old host key for {ip_address} from known_hosts.")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to remove old host key for {ip_address}. Error: {e}")
+        sys.exit(1)
+
+def add_new_host_key(ip_address):
+    command = f"ssh -o StrictHostKeyChecking=no ubuntu@{ip_address} 'exit'"
+    try:
+        subprocess.run(command, shell=True, check=True)
+        print(f"New host key for {ip_address} added to known_hosts.")
+    except subprocess.CalledProcessError as e:
+        print(f"Failed to add new host key for {ip_address}. Error: {e}")
+        sys.exit(1)
+
+def main():
+    bastion_name = tag +"bastion"
+    bastion_ip = get_bastion_ip(bastion_name)
+    remove_old_host_key(bastion_ip)
+    add_new_host_key(bastion_ip)
+
+
 if __name__ == "__main__":
-    private_key_file = sys.argv[2] 
+    main()
+    private_key_file = 'id_rsa'
 
     create_ansible_inventory(existing_nodes, private_key_file)

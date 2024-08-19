@@ -1,9 +1,12 @@
+#!/bin/bash
+
 opernrc="$1"
 tag="$2"
 key="$3"
 unset OS_AUTH_URL
 unset OS_USERNAME
 unset OS_PASSWORD
-source $opernrc
+source "$opernrc"
 chmod +x ./all/cleanup.py
-./all/cleanup.py $opernrc $tag $key
+./all/cleanup.py "$opernrc" "$tag" "$key"
+
