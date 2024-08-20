@@ -388,43 +388,7 @@ def create_ansible_inventory(existing_nodes, private_key_file, inventory_dir="./
                     s.write(f"  StrictHostKeyChecking no\n\n")
 
 
-def get_bastion_ip(bastion_name):
-    command = f"openstack server show -f value -c addresses {bastion_name}"
-    try:
-        bastion_ip = subprocess.check_output(command, shell=True).decode('utf-8').strip()
-        bastion_ip = bastion_ip.split('=')[-1]
-        return bastion_ip
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to retrieve IP address for {bastion_name}. Error: {e}")
-        sys.exit(1)
-
-def remove_old_host_key(ip_address):
-    command = f"ssh-keygen -f ~/.ssh/known_hosts -R {ip_address}"
-    try:
-        subprocess.run(command, shell=True, check=True)
-        print(f"Removed old host key for {ip_address} from known_hosts.")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to remove old host key for {ip_address}. Error: {e}")
-        sys.exit(1)
-
-def add_new_host_key(ip_address):
-    command = f"ssh -o StrictHostKeyChecking=no ubuntu@{ip_address} 'exit'"
-    try:
-        subprocess.run(command, shell=True, check=True)
-        print(f"New host key for {ip_address} added to known_hosts.")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to add new host key for {ip_address}. Error: {e}")
-        sys.exit(1)
-
-def main():
-    bastion_name = tag +"bastion"
-    bastion_ip = get_bastion_ip(bastion_name)
-    remove_old_host_key(bastion_ip)
-    add_new_host_key(bastion_ip)
-
-
 if __name__ == "__main__":
-    main()
     private_key_file = 'id_rsa'
 
     create_ansible_inventory(existing_nodes, private_key_file)

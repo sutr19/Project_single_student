@@ -1,24 +1,24 @@
 [bastion]
-mk-bastion ansible_host=103.57.74.145
+kim-bastion ansible_host=89.46.86.253
 
 [proxy]
-mk-proxy_1 ansible_host=91.106.195.226
-mk-proxy_2 ansible_host=91.123.202.105
+kim-proxy_1 ansible_host=188.95.226.12
+kim-proxy_2 ansible_host=188.95.226.48
 
 [node]
-mk-node_1 ansible_host=10.0.1.21
-mk-node_2 ansible_host=10.0.1.56
-mk-node_3 ansible_host=10.0.1.39
+kim-node_1 ansible_host=10.0.1.31
+kim-node_2 ansible_host=10.0.1.23
+kim-node_3 ansible_host=10.0.1.29
 
 [proxy1]
-mk-proxy_1 ansible_host=10.0.1.23
+kim-proxy_1 ansible_host=10.0.1.6
 
 [proxy2]
-mk-proxy_2 ansible_host=10.0.1.9
+kim-proxy_2 ansible_host=10.0.1.47
 
 [proxyprivate]
-mk-proxy_1 ansible_host=10.0.1.23
-mk-proxy_2 ansible_host=10.0.1.9
+kim-proxy_1 ansible_host=10.0.1.6
+kim-proxy_2 ansible_host=10.0.1.47
 
 [all:vars]
 ansible_user=ubuntu

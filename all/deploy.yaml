@@ -3,7 +3,7 @@
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
-- hosts: Proxy
+- hosts: proxyprivate
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
@@ -34,7 +34,7 @@
     package:
       name: keepalived
       state: present 
-- hosts: Proxy1
+- hosts: proxy1
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
@@ -57,7 +57,7 @@
     service:
       name: nginx
       state: reloaded
-- hosts: Proxy2
+- hosts: proxy2
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes

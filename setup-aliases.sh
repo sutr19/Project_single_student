@@ -3,6 +3,7 @@
 # Define the paths
 BASH_ALIASES="$HOME/.bash_aliases"
 BASHRC="$HOME/.bashrc"
+ZSHRC="$HOME/.zshrc"
 SCRIPT_DIR="/home/roopsai/Desktop/Project_single_student"
 
 # Create or overwrite the .bash_aliases file with the necessary aliases
@@ -54,9 +55,26 @@ else
   echo 'fi' >> "$BASHRC"
 fi
 
-cd 
 # Source the updated .bashrc to apply changes
-# Use the absolute path to avoid issues with sourcing
-source "$HOME ~/.bashrc"
-source "$HOME ~/.zshrc"
-echo "Setup complete. The .bash_aliases file has been created and .bashrc has been updated."
+echo "Applying changes to the current shell session"
+source "$BASHRC"
+
+# If .zshrc exists, update and source it
+if [ -f "$ZSHRC" ]; then
+  echo "Updating $ZSHRC to source $BASH_ALIASES"
+  if grep -q 'source ~/.bash_aliases' "$ZSHRC"; then
+    echo ".zshrc already sources .bash_aliases"
+  else
+    echo 'if [ -f ~/.bash_aliases ]; then' >> "$ZSHRC"
+    echo '    . ~/.bash_aliases' >> "$ZSHRC"
+    echo 'fi' >> "$ZSHRC"
+  fi
+
+  # Source the updated .zshrc to apply changes
+  echo "Applying changes to the current shell session"
+  source "$ZSHRC"
+else
+  echo "$ZSHRC not found. Skipping update for ZSH configuration."
+fi
+
+echo "Setup complete. The .bash_aliases file has been created and .bashrc (and .zshrc if applicable) have been updated."

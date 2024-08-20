@@ -9,7 +9,7 @@ events {
 }
 stream {
   upstream syslog_udp {
-    {% for servers in groups["webservers"] %}
+    {% for servers in groups["node"] %}
       server {{ hostvars[servers]['ansible_default_ipv4']['address'] }}:6000;
     {% endfor %}
   }
@@ -18,7 +18,7 @@ stream {
     proxy_pass syslog_udp;
   }
   upstream stream_backend{
-    {% for servers in groups["webservers"] %}
+    {% for servers in groups["node"] %}
       server {{ hostvars[servers]['ansible_default_ipv4']['address'] }}:5000;
     {% endfor %}
   }

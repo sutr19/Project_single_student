@@ -9,18 +9,19 @@ vrrp_instance VI_1 {
         auth_pass 1234
     }
     virtual_ipaddress {
-        {{ hostvars['tag-proxy3']['public_ip'] }}/32 dev ens3
+        {{ hostvars[groups['proxy'][0]]['ansible_host'] }}/32 dev ens3
     }
 }
 
-virtual_server {{ hostvars['tag-proxy3']['public_ip'] }} 80 {
+virtual_server {{ hostvars[groups['proxy'][0]]['ansible_host'] }} 80 {
     delay_loop 6
     lb_algo rr
     lb_kind NAT
     persistence_timeout 50
     protocol TCP
 
-    {% for host in groups['Proxy'] %}
+    {% for host in groups['node'] %}
+    {% if 'ansible_default_ipv4' in hostvars[host] %}
     real_server {{ hostvars[host]['ansible_default_ipv4']['address'] }} 80 {
         weight 1
         TCP_CHECK {
@@ -29,6 +30,8 @@ virtual_server {{ hostvars['tag-proxy3']['public_ip'] }} 80 {
             delay_before_retry 3
         }
     }
+    {% else %}
+    # Handle the case where ansible_default_ipv4 is not present
+    {% endif %}
     {% endfor %}
 }
-

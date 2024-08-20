@@ -9,6 +9,6 @@ vrrp_instance VI_1 {
         auth_pass 1234
     }
     virtual_ipaddress {
-        {{ hostvars['tag-proxy3']['public_ip'] }}/32 dev ens3
+        {{ hostvars[groups['proxy'][0]]['ansible_host'] }}/32 dev ens3
     }
 }
