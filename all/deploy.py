@@ -338,7 +338,6 @@ def create_ansible_inventory(existing_nodes, private_key_file, inventory_dir="./
                         f.write(f"{hostname} ansible_host={node_info['private_ip'] if not node_info['public_ip'] else node_info['public_ip']}\n")
             f.write("\n")
 
-        # Add specific proxy groups
         if 'proxy' in transformed_nodes:
             proxy_nodes = transformed_nodes['proxy']
             f.write("[proxy1]\n")
@@ -389,6 +388,6 @@ def create_ansible_inventory(existing_nodes, private_key_file, inventory_dir="./
 
 
 if __name__ == "__main__":
-    private_key_file = 'id_rsa'
+    private_key_file = sys.argv[2]
 
     create_ansible_inventory(existing_nodes, private_key_file)

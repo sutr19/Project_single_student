@@ -1,39 +1,39 @@
 Host bastion
-  HostName 89.46.86.253
+  HostName 188.95.226.163
   User ubuntu
   IdentityFile ./id_rsa
   StrictHostKeyChecking no
 
-Host 10.0.1.6
-HostName 10.0.1.6
-  User ubuntu
-  ProxyJump bastion
-  IdentityFile ./id_rsa
-  StrictHostKeyChecking no
-
-Host 10.0.1.47
-HostName 10.0.1.47
+Host 10.0.1.56
+HostName 10.0.1.56
   User ubuntu
   ProxyJump bastion
   IdentityFile ./id_rsa
   StrictHostKeyChecking no
 
-Host 10.0.1.31
-HostName 10.0.1.31
+Host 10.0.1.55
+HostName 10.0.1.55
   User ubuntu
   ProxyJump bastion
   IdentityFile ./id_rsa
   StrictHostKeyChecking no
 
-Host 10.0.1.23
-HostName 10.0.1.23
+Host 10.0.1.16
+HostName 10.0.1.16
   User ubuntu
   ProxyJump bastion
   IdentityFile ./id_rsa
   StrictHostKeyChecking no
 
-Host 10.0.1.29
-HostName 10.0.1.29
+Host 10.0.1.9
+HostName 10.0.1.9
+  User ubuntu
+  ProxyJump bastion
+  IdentityFile ./id_rsa
+  StrictHostKeyChecking no
+
+Host 10.0.1.46
+HostName 10.0.1.46
   User ubuntu
   ProxyJump bastion
   IdentityFile ./id_rsa

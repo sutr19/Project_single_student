@@ -41,7 +41,7 @@
      mode: 0644
   - name: "running flask app"
     shell: gunicorn -w 2 -D -b 0.0.0.0:5000 service:app
-- hosts: Proxy
+- hosts: proxyprivate
   vars:
     ansible_ssh_common_args: '-F ./all/ssh_config'
   gather_facts: yes
