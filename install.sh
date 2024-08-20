@@ -68,6 +68,6 @@ unset OS_PASSWORD
 source $opernrc
 chmod +x ./all/deploy.py
 ./all/deploy.py $tag $key
-#ansible-playbook ./all/deploy.yaml
+ansible-playbook ./all/deploy.yaml
 
 
