@@ -6,7 +6,7 @@ key="$3"
 #!/bin/bash
 
 
-key="id_rsa"  # Replace with the desired private key name
+key=$key  # Replace with the desired private key name
 
 script_dir="$(dirname "$(realpath "$0")")"
 
@@ -68,6 +68,6 @@ unset OS_PASSWORD
 source $opernrc
 chmod +x ./all/deploy.py
 ./all/deploy.py $tag $key
-ansible-playbook ./all/deploy.yaml
+#ansible-playbook ./all/deploy.yaml
 
 

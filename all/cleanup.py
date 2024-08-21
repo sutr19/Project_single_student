@@ -18,9 +18,9 @@ router_obj = conn.network.find_router(tag + 'router')
 security_group_obj = conn.network.find_security_group(tag + 'security_group')
 
 
-del_keypair = keypair_obj.name
-conn.compute.delete_keypair(del_keypair)
-print(f"Keypair {del_keypair} deleted")
+#del_keypair = keypair_obj.name
+#conn.compute.delete_keypair(del_keypair)
+#print(f"Keypair {del_keypair} deleted")
 
 
 
