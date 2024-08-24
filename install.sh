@@ -37,7 +37,7 @@ unset OS_USERNAME
 unset OS_PASSWORD
 source $openrc
 chmod +x ./all/deploy.py
-#./all/deploy.py $tag $key
-#ansible-playbook ./all/deploy.yaml
+./all/deploy.py $tag $key
+ansible-playbook ./all/deploy.yaml
 
 
