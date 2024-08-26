@@ -57,6 +57,6 @@ fi
 cd 
 # Source the updated .bashrc to apply changes
 # Use the absolute path to avoid issues with sourcing
-source "$HOME ~/.bashrc"
-source "$HOME ~/.zshrc"
+source "$HOME/.bashrc"
+source "$HOME/.zshrc"
 echo "Setup complete. The .bash_aliases file has been created and .bashrc has been updated."

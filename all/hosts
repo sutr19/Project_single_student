@@ -1,25 +1,25 @@
 [bastion]
-ksi-bastion ansible_host=188.95.226.238
+ksi-bastion ansible_host=188.212.108.20
 
 [proxy]
-ksi-proxy_2 ansible_host=188.95.226.152
-ksi-proxy_1 ansible_host=188.95.226.163
+ksi-proxy_2 ansible_host=91.123.202.210
+ksi-proxy_1 ansible_host=103.57.74.82
 
 [node]
-ksi-node_4 ansible_host=10.0.1.41
-ksi-node_3 ansible_host=10.0.1.52
-ksi-node_2 ansible_host=10.0.1.12
-ksi-node_1 ansible_host=10.0.1.45
+ksi-node_4 ansible_host=10.0.1.60
+ksi-node_3 ansible_host=10.0.1.48
+ksi-node_2 ansible_host=10.0.1.7
+ksi-node_1 ansible_host=10.0.1.25
 
 [proxy1]
-ksi-proxy_1 ansible_host=10.0.1.28
+ksi-proxy_1 ansible_host=10.0.1.30
 
 [proxy2]
 ksi-proxy_2 ansible_host=10.0.1.21
 
 [proxyprivate]
 ksi-proxy_2 ansible_host=10.0.1.21
-ksi-proxy_1 ansible_host=10.0.1.28
+ksi-proxy_1 ansible_host=10.0.1.30
 
 [all:vars]
 ansible_user=ubuntu
